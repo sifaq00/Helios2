@@ -244,11 +244,11 @@ export default function TerminalDashboard() {
                     </div>
                     
                     <a href={news.link} target="_blank" rel="noopener noreferrer" className="block group-hover:text-white transition-colors">
-                      <h3 className="mb-2 text-sm font-bold text-gray-200 leading-snug">
+                      <h3 className="mb-2 text-sm font-bold text-gray-200 leading-snug break-words">
                         {news.text.split('\n')[0].replace(/<[^>]*>?/gm, '')} {/* Strip HTML tags jika ada */}
                       </h3>
                       {news.aiRating?.summary && (
-                        <p className="mb-3 text-[11px] text-gray-400 line-clamp-2">
+                        <p className="mb-3 text-[11px] text-gray-400 line-clamp-2 break-words">
                           {news.aiRating.summary}
                         </p>
                       )}

@@ -24,6 +24,117 @@ interface NewsItem {
   };
 }
 
+// Function to parse AI response and convert to React elements
+const parseAIResponse = (text: string) => {
+  const lines = text.split('\n');
+  const elements: React.JSX.Element[] = [];
+  let key = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (line.startsWith('### ')) {
+      // Main headers
+      elements.push(
+        <h3 key={key++} className="text-lg font-bold text-[#ff0000] mb-3 mt-4 tracking-widest">
+          {line.replace('### ', '').toUpperCase()}
+        </h3>
+      );
+    } else if (line.startsWith('#### ')) {
+      // Sub headers
+      elements.push(
+        <h4 key={key++} className="text-md font-bold text-white mb-2 mt-3 tracking-wide">
+          {line.replace('#### ', '')}
+        </h4>
+      );
+    } else if (line.startsWith('**') && line.endsWith('**')) {
+      // Bold text
+      elements.push(
+        <p key={key++} className="font-bold text-white mb-2">
+          {line.replace(/\*\*/g, '')}
+        </p>
+      );
+    } else if (line.startsWith('- **') && line.includes('**:') && line.endsWith('**')) {
+      // Bold list items with descriptions
+      const parts = line.split('**:');
+      if (parts.length === 2) {
+        const title = parts[0].replace('- **', '').replace('**', '');
+        const description = parts[1].replace('**', '');
+        elements.push(
+          <div key={key++} className="mb-3 pl-4 border-l border-[#333]">
+            <div className="font-bold text-[#ff0000] mb-1">{title}:</div>
+            <div className="text-gray-300 text-sm">{description}</div>
+          </div>
+        );
+      }
+    } else if (line.startsWith('- **')) {
+      // Bold list items
+      elements.push(
+        <div key={key++} className="mb-2 pl-4 border-l border-[#333]">
+          <span className="font-bold text-white">{line.replace('- **', '').replace('**', '')}</span>
+        </div>
+      );
+    } else if (line.match(/^\d+\. \*\*/)) {
+      // Numbered bold items
+      const match = line.match(/^(\d+)\. \*\*(.*)\*\*/);
+      if (match) {
+        elements.push(
+          <div key={key++} className="mb-2 pl-4 border-l border-[#333]">
+            <span className="font-bold text-[#ff0000]">{match[1]}. </span>
+            <span className="font-bold text-white">{match[2]}</span>
+          </div>
+        );
+      }
+    } else if (line.startsWith('1. ') || line.startsWith('2. ') || line.startsWith('3. ') || line.startsWith('4. ') || line.startsWith('5. ')) {
+      // Numbered lists
+      elements.push(
+        <div key={key++} className="mb-2 pl-4 border-l border-[#333]">
+          <span className="text-gray-300 text-sm">{line}</span>
+        </div>
+      );
+    } else if (line === '') {
+      // Empty lines for spacing
+      elements.push(<div key={key++} className="h-2"></div>);
+    } else if (line.length > 0) {
+      // Regular paragraphs
+      elements.push(
+        <p key={key++} className="text-gray-300 text-sm leading-relaxed mb-2">
+          {line}
+        </p>
+      );
+    }
+  }
+
+  return elements;
+};
+
+// Function to clean up news text by removing HTML tags and unwanted metadata
+const cleanNewsText = (text: string): string => {
+  if (!text) return '';
+  
+  // Remove HTML tags
+  let cleaned = text.replace(/<[^>]*>?/gm, '');
+  
+  // Remove common unwanted patterns
+  cleaned = cleaned.replace(/Link: https?:\/\/[^\s]+/gi, '');
+  cleaned = cleaned.replace(/Released at: [^\n]+/gi, '');
+  cleaned = cleaned.replace(/Crawled at: [^\n]+/gi, '');
+  cleaned = cleaned.replace(/#[A-Za-z0-9]+/g, ''); // Remove hashtags
+  cleaned = cleaned.replace(/Binance Important Notice/gi, ''); // Remove specific prefixes
+  
+  // Clean up extra whitespace and newlines
+  cleaned = cleaned.replace(/\n+/g, ' ').trim();
+  cleaned = cleaned.replace(/\s+/g, ' ');
+  
+  // Remove trailing punctuation if it's just metadata remnants
+  cleaned = cleaned.replace(/[|•\-\s:]+$/g, '');
+  
+  // Capitalize first letter and ensure proper sentence structure
+  cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  
+  return cleaned.trim();
+};
+
 export default function AssetDetail() {
   const params = useParams();
   const rawCoin = params.coin as string;
@@ -62,23 +173,42 @@ export default function AssetDetail() {
 
   // Simulasi Pemanggilan LLM (OpenRouter)
   // Di produksi nyata, ini akan menembak ke endpoint /api/ai/summary milik Anda
-  const generateAIInsight = () => {
+  const generateAIInsight = async () => {
+    if (news.length === 0) return;
+    
     setIsGenerating(true);
     setAiInsight("");
     
-    // Teks mock hasil analisis AI (Copywriting dalam bahasa Inggris)
-    const mockAnalysis = `[SYSTEM SYNTHESIS INITIALIZED] \n\nAnalyzing ${news.length} recent data nodes for ${coin}... \n\nSENTIMENT OVERVIEW: The current market narrative indicates a ${bullishCount > bearishCount ? 'BULLISH' : 'BEARISH'} tilt. Institutional chatter is rising. \n\nKEY DRIVERS: Recent developments suggest impending volatility. Smart money is positioning for a breakout within the next 48 hours. Watch critical resistance levels closely. \n\nALPHA SIGNAL: Accumulation phase detected. Proceed with calculated risk sizing.`;
-    
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= mockAnalysis.length) {
-        setAiInsight(mockAnalysis.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-        setIsGenerating(false);
-      }
-    }, 20); // Kecepatan ketik AI
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          coin: coin,
+          newsData: news.slice(0, 10), // Kirim 10 berita terbaru saja agar hemat token
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      // Jalankan efek pengetikan untuk hasil dari AI asli
+      let currentIndex = 0;
+      const fullText = data.result;
+      const typingInterval = setInterval(() => {
+        if (currentIndex <= fullText.length) {
+          setAiInsight(fullText.slice(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(typingInterval);
+          setIsGenerating(false);
+        }
+      }, 15);
+
+    } catch (error) {
+      setAiInsight("[ERROR: AI_LINK_FAILURE] - Connection to Neural Network lost.");
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -139,7 +269,7 @@ export default function AssetDetail() {
                 <h2 className="font-bold tracking-widest text-[#ff0000]">NEURAL SYNTHESIS</h2>
               </div>
               
-              <div className="p-6 min-h-[250px] flex flex-col">
+              <div className="p-6 h-[400px] flex flex-col">
                 {!aiInsight && !isGenerating ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4">
                     <Activity className="h-12 w-12 text-gray-700 mb-2" />
@@ -154,11 +284,16 @@ export default function AssetDetail() {
                     </button>
                   </div>
                 ) : (
-                  <div className="relative z-10">
-                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-300">
-                      {aiInsight}
-                      {isGenerating && <span className="animate-pulse text-[#ff0000] font-bold">_</span>}
-                    </pre>
+                  <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="space-y-1">
+                      {parseAIResponse(aiInsight)}
+                      {isGenerating && (
+                        <div className="flex items-center gap-1 mt-4">
+                          <span className="text-[#ff0000] font-bold animate-pulse">_</span>
+                          <span className="text-[#ff0000] text-xs">PROCESSING NEURAL DATA...</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -219,7 +354,7 @@ export default function AssetDetail() {
                         )}
                       </div>
                       <a href={item.link} target="_blank" rel="noopener noreferrer" className="block group-hover:text-white text-gray-300 transition-colors text-sm">
-                        {item.text.split('\n')[0]}
+                        {cleanNewsText(item.text.split('\n')[0])}
                       </a>
                     </article>
                   ))

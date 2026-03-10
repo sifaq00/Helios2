@@ -36,10 +36,10 @@ graph TD
     end
 
     subgraph "API_ROUTING_LAYER [ENCRYPTED]"
-        N_EP[/api/news]
-        A_EP[/api/ai]
-        B_EP[/api/daily-brief]
-        V_EP[/api/viral-radar]
+        N_EP["/api/news"]
+        A_EP["/api/ai"]
+        B_EP["/api/daily-brief"]
+        V_EP["/api/viral-radar"]
     end
 
     subgraph "NEURAL_CORE [INTELLIGENCE]"

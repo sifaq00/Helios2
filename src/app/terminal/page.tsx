@@ -12,7 +12,8 @@ import {
   RefreshCw,
   Crosshair,
   Github,
-  Twitter
+  Twitter,
+  Video // <-- Icon baru untuk Live Video
 } from "lucide-react";
 
 interface NewsItem {
@@ -36,11 +37,14 @@ export default function TerminalDashboard() {
   const [error, setError] = useState<string | null>(null);
   
   const [viralAnomalies, setViralAnomalies] = useState<any[]>([]);
-  const [isViralLoading, setIsViralLoading] = useState(true); // State baru
+  const [isViralLoading, setIsViralLoading] = useState(true);
   
   const [dailyBrief, setDailyBrief] = useState<string>("");
-  const [isBriefLoading, setIsBriefLoading] = useState(true); // State baru
+  const [isBriefLoading, setIsBriefLoading] = useState(true);
   
+  // ID YouTube Live 24/7 (Contoh: Al Jazeera English / Bloomberg / Sky News)
+  // Anda bisa menggantinya nanti. gCNeDWCI0vo = Al Jazeera Live
+  const LIVE_STREAM_ID = "gCNeDWCI0vo"; 
 
   const fetchNews = async () => {
     setIsLoading(true);
@@ -192,10 +196,40 @@ export default function TerminalDashboard() {
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 p-6 md:grid-cols-12 md:p-8">
         
         {/* =========================================
-            LEFT COLUMN: BREAKING NEWS & AI SIGNALS 
+            LEFT COLUMN: BREAKING NEWS, VIDEO & AI SIGNALS 
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-3">
           
+          {/* =====================
+              NEW: LIVE VIDEO FEED 
+              ===================== */}
+          <section className="border border-[#333] bg-black shadow-[0_0_10px_rgba(255,0,0,0.05)]">
+            <div className="flex items-center justify-between border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
+              <div className="flex items-center gap-2">
+                <Video className="h-4 w-4 text-[#ff0000] animate-pulse" />
+                <h2>LIVE_UPLINK</h2>
+              </div>
+              <span className="text-[9px] bg-[#ff0000] text-black px-1 font-bold animate-pulse">REC</span>
+            </div>
+            {/* Wrapper Video - Filter CSS memberikan efek Cyberpunk (Hacker Cam) */}
+            <div className="relative aspect-video w-full overflow-hidden bg-[#050505] p-1 group">
+              {/* Scanline & Red Overlay */}
+              <div className="absolute inset-0 z-10 pointer-events-none bg-dither opacity-10"></div>
+              <div className="absolute inset-0 z-10 pointer-events-none bg-[#ff0000] mix-blend-multiply opacity-20 group-hover:opacity-10 transition-opacity"></div>
+              
+              <iframe
+                src={`https://www.youtube.com/embed/${LIVE_STREAM_ID}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0`}
+                className="w-full h-full opacity-80 grayscale contrast-125"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <div className="bg-[#0a0a0a] p-2 flex justify-between items-center text-[9px] text-gray-500 border-t border-[#333]">
+               <span className="flex items-center gap-1"><Activity className="h-3 w-3 text-green-500" /> SAT_LINK: STABLE</span>
+               <span className="uppercase text-[#ff0000]">CH: OMEGA-7</span>
+            </div>
+          </section>
+
           <section className="border border-[#ff0000] bg-[#110000]">
             <div className="flex items-center gap-2 border-b border-[#ff0000] bg-[#ff0000] px-3 py-2 text-black font-bold tracking-widest text-sm">
               <AlertTriangle className="h-4 w-4" />

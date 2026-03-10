@@ -1,26 +1,140 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
+  --primary-red: #ff0000;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Memastikan mode gelap selalu aktif jika terdeteksi oleh sistem */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
   }
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  /* Menggunakan font monospace bawaan untuk kesan terminal */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   CRT & SCANLINES EFFECTS
+   ========================================= */
+
+.scanlines {
+  position: relative;
+  min-height: 100vh;
+}
+
+.scanlines::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Pola garis horizontal transparan dan hitam tipis */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.25)
+  );
+  background-size: 100% 4px;
+  pointer-events: none; /* Agar tidak menghalangi klik pada elemen di bawahnya */
+  z-index: 50;
+}
+
+/* Efek kedipan monitor CRT */
+@keyframes flicker {
+  0% { opacity: 0.95; }
+  5% { opacity: 0.85; }
+  10% { opacity: 0.95; }
+  15% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+.crt-flicker {
+  animation: flicker 0.15s infinite;
+}
+
+/* =========================================
+   GLITCH TEXT EFFECT
+   ========================================= */
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+/* Duplikat teks untuk efek pecah warna merah dan putih */
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -2px 0 var(--primary-red);
+  clip: rect(24px, 550px, 90px, 0);
+  animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -2px 0 var(--foreground);
+  clip: rect(85px, 550px, 140px, 0);
+  animation: glitch-anim 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(10px, 9999px, 44px, 0); }
+  5% { clip: rect(65px, 9999px, 56px, 0); }
+  10% { clip: rect(8px, 9999px, 83px, 0); }
+  15% { clip: rect(51px, 9999px, 16px, 0); }
+  20% { clip: rect(18px, 9999px, 39px, 0); }
+  25% { clip: rect(62px, 9999px, 49px, 0); }
+  30% { clip: rect(93px, 9999px, 100px, 0); }
+  35% { clip: rect(44px, 9999px, 25px, 0); }
+  40% { clip: rect(26px, 9999px, 60px, 0); }
+  45% { clip: rect(80px, 9999px, 4px, 0); }
+  50% { clip: rect(55px, 9999px, 88px, 0); }
+  55% { clip: rect(74px, 9999px, 71px, 0); }
+  60% { clip: rect(31px, 9999px, 94px, 0); }
+  65% { clip: rect(96px, 9999px, 63px, 0); }
+  70% { clip: rect(14px, 9999px, 12px, 0); }
+  75% { clip: rect(59px, 9999px, 76px, 0); }
+  80% { clip: rect(87px, 9999px, 34px, 0); }
+  85% { clip: rect(3px, 9999px, 51px, 0); }
+  90% { clip: rect(41px, 9999px, 20px, 0); }
+  95% { clip: rect(69px, 9999px, 98px, 0); }
+  100% { clip: rect(22px, 9999px, 85px, 0); }
+}
+
+/* =========================================
+   DITHERING PATTERN UTILITY
+   ========================================= */
+
+.bg-dither {
+  background-image: radial-gradient(rgba(255, 0, 0, 0.15) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+.bg-dither-white {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 3px 3px;
 }

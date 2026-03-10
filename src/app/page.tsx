@@ -1,65 +1,127 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import SplashScreen from "@/components/SplashScreen";
+import { Terminal, Cpu, Activity } from "lucide-react";
+
+export default function LandingPage() {
+  const [showSplash, setShowSplash] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    // Check visit history in localStorage
+    const hasVisited = localStorage.getItem("hasVisitedMailMan");
+    
+    if (!hasVisited) {
+      setShowSplash(true);
+    }
+  }, []);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    localStorage.setItem("hasVisitedMailMan", "true");
+  };
+
+  // Prevent hydration error in Next.js
+  if (!isMounted) return null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="scanlines min-h-screen bg-black text-white selection:bg-[#ff0000] selection:text-black font-mono">
+      {showSplash ? (
+        <SplashScreen onComplete={handleSplashComplete} />
+      ) : (
+        <div className="relative z-10 mx-auto max-w-6xl px-6 py-12 md:py-24">
+          
+          {/* Header / Nav minimalis */}
+          <nav className="flex items-center justify-between border-b border-[#333] pb-6 mb-16">
+            <div className="text-[#ff0000] font-bold tracking-widest text-xl crt-flicker">MM_SYS</div>
+            <Link 
+              href="/terminal" 
+              className="border border-[#ff0000] bg-black px-4 py-2 text-xs text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black uppercase tracking-widest"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              [ Access Terminal ]
+            </Link>
+          </nav>
+
+          {/* Hero Section */}
+          <div className="flex flex-col-reverse items-center justify-between gap-16 md:flex-row">
+            
+            {/* Kiri: Teks & CTA */}
+            <div className="flex-1 space-y-8 text-left">
+              <div>
+                <h2 className="text-xs tracking-[0.3em] text-gray-500 mb-2">// SECURE CRYPTO INTELLIGENCE</h2>
+                <h1 
+                  className="glitch-text text-6xl font-black uppercase tracking-tighter md:text-8xl" 
+                  data-text="MAIL MAN"
+                >
+                  MAIL MAN
+                </h1>
+              </div>
+              
+              <p className="max-w-md text-sm leading-relaxed text-gray-400">
+                AI-powered crypto intelligence platform. Real-time news aggregation, sentiment analysis, and underground alpha signals. <span className="text-white bg-[#ff0000] px-1">Zero noise.</span>
+              </p>
+
+              <div className="pt-4">
+                <Link 
+                  href="/terminal" 
+                  className="group relative inline-flex items-center gap-4 border border-[#ff0000] bg-black px-8 py-4 text-sm text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black shadow-[0_0_15px_rgba(255,0,0,0.2)] hover:shadow-[0_0_30px_rgba(255,0,0,0.6)]"
+                >
+                  <span className="font-bold tracking-widest">INITIALIZE CONNECTION</span>
+                  <Terminal className="h-4 w-4 group-hover:animate-pulse" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Kanan: Placeholder untuk Pixel Art (sesuai deskripsi prompt Anda) */}
+            <div className="relative flex-1 flex justify-center items-center">
+              {/* Efek Glitch Halo Merah di belakang gambar */}
+              <div className="absolute top-1/2 left-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#ff0000] shadow-[0_0_50px_rgba(255,0,0,0.5)] animate-pulse mix-blend-screen glitch-anim"></div>
+              <div className="absolute top-1/2 left-1/2 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[#ff0000] opacity-50 animate-[spin_10s_linear_infinite]"></div>
+              
+              {/* Kotak Placeholder Gambar */}
+              <div className="relative z-10 h-[400px] w-[300px] bg-black border border-[#333] bg-dither flex flex-col items-center justify-end pb-8 overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                
+                {/* Later, place your <img src="/pixel-art-profile.png" /> tag here.
+                  Make sure the image background is transparent to blend with the dithering.
+                */}
+                <div className="text-center opacity-50 group-hover:opacity-100 transition-opacity">
+                  <div className="text-xs text-[#ff0000] mb-2 crt-flicker">[ INSERT AVATAR HERE ]</div>
+                </div>
+
+                {/* Typography bawah sesuai deskripsi */}
+                <h3 className="relative z-20 mt-auto text-4xl font-black italic text-white drop-shadow-[2px_0_0_#ff0000] uppercase tracking-tighter">
+                  MAIL MAN
+                </h3>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Features Grid */}
+          <div className="mt-32 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="border border-[#333] bg-black/50 p-6 transition-colors hover:border-[#ff0000]">
+              <Terminal className="mb-4 h-8 w-8 text-[#ff0000]" />
+              <h3 className="mb-2 text-lg font-bold text-white uppercase">News Terminal</h3>
+              <p className="text-xs leading-relaxed text-gray-400">Real-time news aggregation from various underground sources. Noise-free.</p>
+            </div>
+            <div className="border border-[#333] bg-black/50 p-6 transition-colors hover:border-[#ff0000]">
+              <Cpu className="mb-4 h-8 w-8 text-[#ff0000]" />
+              <h3 className="mb-2 text-lg font-bold text-white uppercase">AI Analysis</h3>
+              <p className="text-xs leading-relaxed text-gray-400">Smart impact scoring and narrative detection. Know market direction before others.</p>
+            </div>
+            <div className="border border-[#333] bg-black/50 p-6 transition-colors hover:border-[#ff0000]">
+              <Activity className="mb-4 h-8 w-8 text-[#ff0000]" />
+              <h3 className="mb-2 text-lg font-bold text-white uppercase">Alpha Signals</h3>
+              <p className="text-xs leading-relaxed text-gray-400">Contextual insights for trading. Bullish, neutral, bearish with accuracy percentages.</p>
+            </div>
+          </div>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }

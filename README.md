@@ -4,13 +4,15 @@
 
 [![Status](https://img.shields.io/badge/Status-V1.0_LIVE-green?style=for-the-badge)]()
 [![Core](https://img.shields.io/badge/AI_Engine-ONLINE-red?style=for-the-badge)]()
+[![X](https://img.shields.io/badge/X-Follow%20Us-black?style=for-the-badge&logo=x)](https://x.com/mailmanonx)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/omnicima/mail-man)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 Official Terminal: [Your Website Here]
 
 CA: [Contract Address Here]
 
-Twitter: [Your Twitter Here]
+Twitter: [https://x.com/mailmanonx](https://x.com/mailmanonx)
 
 ## 📡 The Transmission
 
@@ -23,18 +25,92 @@ We quantify market uncertainty — modeling volatility, detecting regime shifts,
 
 ---
 
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph "USER_INTERFACE [MM_SYS]"
+        UI[Terminal Dashboard]
+        V_RADAR[Viral Radar]
+        A_SIG[Alpha Signals Panel]
+    end
+
+    subgraph "API_ROUTING_LAYER [ENCRYPTED]"
+        N_EP[/api/news]
+        A_EP[/api/ai]
+        B_EP[/api/daily-brief]
+        V_EP[/api/viral-radar]
+    end
+
+    subgraph "NEURAL_CORE [INTELLIGENCE]"
+        OR[OpenRouter API / Mistral Small]
+        ON[OpenNews API / Data Source]
+    end
+
+    UI --> N_EP
+    UI --> A_EP
+    UI --> B_EP
+    UI --> V_EP
+
+    N_EP --> ON
+    A_EP --> OR
+    B_EP --> OR
+    V_EP --> ON
+
+    ON -- "Raw News Stream" --> N_EP
+    OR -- "Sentiment & Signals" --> A_EP
+    ON -- "Market Anomalies" --> V_EP
+    OR -- "Intelligence Brief" --> B_EP
+
+    style UI fill:#000,stroke:#f00,stroke-width:2px,color:#fff
+    style NEURAL_CORE fill:#111,stroke:#f00,stroke-dasharray: 5 5,color:#f00
+    style OR fill:#111,stroke:#f00,color:#fff
+    style ON fill:#111,stroke:#f00,color:#fff
+```
+
 ## 🛠️ Tech Stack
 
 ### Interface Layer
 * **Next.js 15 + TypeScript:** Modern, type-safe React framework for real-time dashboards.
 * **Tailwind CSS:** Utility-first styling for responsive design.
-* **Lightweight Charts:** Financial instrumentation for high-performance market data visualization.
 * **Lucide React:** Minimalist iconography for market indicators.
+* **Custom CRT Effects:** Scanlines and flicker overlays for terminal immersion.
 
 ### Neural Core (AI Engine)
-* **AI Analysis Engine:** Integrated LLM for technical analysis and market sentiment.
-* **WebSocket Matrix:** Live telemetry from crypto news APIs and market feeds.
-* **Quant Simulation Engine:** Real-time data processing for crypto signals and market predictions.
+* **Intelligence Layer:** Integrated with **OpenRouter (Mistral Small)** for advanced technical analysis and market sentiment.
+* **Data Ingestion:** Real-time news aggregation via **OpenNews API**.
+* **Quant Logic:** 
+  - **Dynamic Viral Radar:** Detects mentions spikes and growth multipliers.
+  - **Narrative Intercepts:** Identifies macro themes (AI, DePIN, L2) in the raw data stream.
+  - **Alpha Pulse:** Correlates AI ratings with technical signals.
+
+---
+
+## 🚀 Key Features
+
+- **RAW_DATA_STREAM:** Live decrypted news feed with real-time AI Impact Scoring.
+- **ALPHA SIGNALS:** Direct actionable pings (LONG/SHORT) with clickable source verified data.
+- **NEURAL BRIEF:** Daily system reports summarizing the global market matrix.
+- **LANGUAGE FILTER:** Multi-language support with "English Only" intercept toggle for cleaner analysis.
+- **VIRAL RADAR:** Real-time anomaly detection for assets gaining extreme social momentum.
+
+---
+
+## 🔧 Environment Setup
+
+Create a `.env.local` file in the root directory:
+
+```bash
+OPENNEWS_API_TOKEN=your_opennews_token
+OPENROUTER_API_KEY=your_openrouter_key
+```
+
+Install dependencies and start the terminal:
+
+```bash
+pnpm install
+pnpm dev
+```
 
 ---
 

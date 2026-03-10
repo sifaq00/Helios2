@@ -5,12 +5,10 @@ export async function GET() {
   const { data, error } = await supabase
     .from('terminal_cache')
     .select('payload')
-    .eq('id', 'daily_brief')
+    .eq('id', 'alpha_signals')
     .single();
 
-  if (error || !data) {
-    return NextResponse.json({ success: true, brief: "[SYSTEM_ERROR]: Database offline." });
-  }
+  if (error || !data) return NextResponse.json([]);
   
-  return NextResponse.json({ success: true, brief: data.payload.brief });
+  return NextResponse.json(data.payload);
 }

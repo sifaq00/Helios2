@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SplashScreen from "@/components/SplashScreen";
-import { Terminal, Cpu, Activity } from "lucide-react";
+import { Terminal, Cpu, Activity, Github, Twitter } from "lucide-react";
 
 // ==========================================
 // KOMPONEN INTERAKTIF BACKGROUND (RETRO PARTICLES)
@@ -97,7 +97,18 @@ export default function LandingPage() {
             
             {/* Header / Nav minimalis */}
             <nav className="flex items-center justify-between border-b border-[#333] pb-6 mb-16 relative z-20">
-              <div className="text-[#ff0000] font-bold tracking-widest text-xl crt-flicker">MM_SYS</div>
+              <div className="flex items-center gap-6">
+                <div className="text-[#ff0000] font-bold tracking-widest text-xl crt-flicker">MM_SYS</div>
+                <div className="hidden md:flex items-center gap-4 border-l border-[#333] pl-6 h-4">
+                  <a href="https://x.com/mailmanonx" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff0000] transition-colors">
+                    <Twitter className="h-4 w-4" />
+                  </a>
+                  <a href="https://github.com/omnicima/mail-man" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff0000] transition-colors">
+                    <Github className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+              
               <Link 
                 href="/terminal" 
                 className="border border-[#ff0000] bg-black px-4 py-2 text-xs text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black uppercase tracking-widest backdrop-blur-sm"

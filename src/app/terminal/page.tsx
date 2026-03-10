@@ -10,10 +10,11 @@ import {
   TrendingUp, 
   Settings,
   RefreshCw,
-  Crosshair
+  Crosshair,
+  Github,
+  Twitter
 } from "lucide-react";
 
-// Tipe data untuk berita
 interface NewsItem {
   id: string;
   text: string;
@@ -33,14 +34,19 @@ export default function TerminalDashboard() {
   const [newsFeed, setNewsFeed] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
   const [viralAnomalies, setViralAnomalies] = useState<any[]>([]);
+  const [isViralLoading, setIsViralLoading] = useState(true); // State baru
+  
   const [dailyBrief, setDailyBrief] = useState<string>("");
+  const [isBriefLoading, setIsBriefLoading] = useState(true); // State baru
+  
 
   const fetchNews = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/news?limit=50"); // Kita ambil 50 data agar analisanya lebih akurat
+      const response = await fetch("/api/news?limit=50"); 
       if (!response.ok) throw new Error("SECURE CONNECTION FAILED");
       
       const data = await response.json();
@@ -53,6 +59,7 @@ export default function TerminalDashboard() {
   };
 
   const fetchViralData = async () => {
+    setIsViralLoading(true);
     try {
       const res = await fetch('/api/viral-radar');
       const data = await res.json();
@@ -61,10 +68,13 @@ export default function TerminalDashboard() {
       }
     } catch (err) {
       console.error("Viral Radar offline", err);
+    } finally {
+      setIsViralLoading(false);
     }
   };
 
   const fetchDailyBrief = async () => {
+    setIsBriefLoading(true);
     try {
       const res = await fetch('/api/daily-brief');
       const data = await res.json();
@@ -73,6 +83,8 @@ export default function TerminalDashboard() {
       }
     } catch (err) {
       console.error("Daily Brief generation failed", err);
+    } finally {
+      setIsBriefLoading(false);
     }
   };
 
@@ -83,15 +95,11 @@ export default function TerminalDashboard() {
     const interval = setInterval(() => {
       fetchNews();
       fetchViralData();
-    }, 60000); // Polling 60 detik
+    }, 60000); 
     return () => clearInterval(interval);
   }, []);
 
-  // ==========================================
-  // LOGIKA ANALISIS DATA DINAMIS (AI MODULES)
-  // ==========================================
-
-  // 1. Ekstraksi Top Mentions (Koin yang paling sering disebut)
+  // 1. Ekstraksi Top Mentions
   const getTopMentions = () => {
     const counts: Record<string, number> = {};
     newsFeed.forEach(item => {
@@ -103,11 +111,11 @@ export default function TerminalDashboard() {
     });
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5) // Ambil Top 5
+      .slice(0, 5) 
       .map(([symbol, count]) => ({ symbol, count }));
   };
 
-  // 2. Ekstraksi Tren Narasi (Pencocokan Kata Kunci Berbasis Teks)
+  // 2. Ekstraksi Tren Narasi
   const getTrendingNarratives = () => {
     const narratives = {
       "MACRO / GEOPOLITICS": ["war", "fed", "rate", "sec", "inflation", "iran", "israel", "russia", "trump"],
@@ -130,9 +138,8 @@ export default function TerminalDashboard() {
 
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 4) // Ambil Top 4 Narasi
+      .slice(0, 4) 
       .map(([name, count]) => {
-        // Mock kalkulasi momentum %
         const momentum = (count * 4.2).toFixed(1);
         return { name, count, momentum };
       });
@@ -141,7 +148,6 @@ export default function TerminalDashboard() {
   const topMentions = getTopMentions();
   const trendingNarratives = getTrendingNarratives();
 
-  // Memisahkan berita khusus
   const highImpactNews = newsFeed.filter(n => (n.aiRating?.score || 0) >= 70);
   const topNews = highImpactNews.length > 0 ? highImpactNews[0] : null;
   const actionSignals = newsFeed.filter(n => n.aiRating?.signal === "long" || n.aiRating?.signal === "short").slice(0, 3);
@@ -163,6 +169,16 @@ export default function TerminalDashboard() {
           <button onClick={fetchNews} className="text-gray-500 hover:text-[#ff0000] transition-colors" title="Force Refresh">
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-[#ff0000]' : ''}`} />
           </button>
+          
+          <div className="flex items-center gap-3 border-l border-[#333] pl-4">
+            <a href="https://x.com/mailmanonx" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff0000] transition-colors">
+              <Twitter className="h-4 w-4" />
+            </a>
+            <a href="https://github.com/omnicima/mail-man" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff0000] transition-colors">
+              <Github className="h-4 w-4" />
+            </a>
+          </div>
+
           <div className="hidden items-center gap-2 text-xs text-[#ff0000] md:flex animate-pulse">
             <Activity className="h-4 w-4" />
             LIVE FEED
@@ -239,22 +255,25 @@ export default function TerminalDashboard() {
             CENTER COLUMN: RAW DATA STREAM
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-6">
-          {/* AI Intelligence Brief - Command Brief Card */}
-          {dailyBrief && (
-            <section className="border border-[#ff0000] bg-[#110000] p-4 relative overflow-hidden group">
-              {/* Scanline overlay */}
-              <div className="absolute inset-0 bg-gradient-to-b from-[#ff000010] to-transparent pointer-events-none"></div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-2 w-2 bg-[#ff0000] animate-ping"></div>
-                <h3 className="text-[11px] font-bold tracking-[0.3em] text-[#ff0000]">
-                  [SYSTEM_REPORT_{new Date().toLocaleDateString().replace(/\//g, '')}]
-                </h3>
-              </div>
-              <div className="relative z-10 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-line border-l border-[#ff000040] pl-3 italic">
-                {dailyBrief}
-              </div>
-            </section>
-          )}
+          {/* AI Intelligence Brief */}
+          <section className="border border-[#ff0000] bg-[#110000] p-4 relative overflow-hidden group min-h-[100px]">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#ff000010] to-transparent pointer-events-none"></div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-2 w-2 bg-[#ff0000] animate-ping"></div>
+              <h3 className="text-[11px] font-bold tracking-[0.3em] text-[#ff0000]">
+                [SYSTEM_REPORT_{new Date().toLocaleDateString().replace(/\//g, '')}]
+              </h3>
+            </div>
+            <div className="relative z-10 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-line border-l border-[#ff000040] pl-3 italic">
+              {isBriefLoading ? (
+                <span className="animate-pulse text-gray-500">Decrypting daily intel...</span>
+              ) : dailyBrief ? (
+                dailyBrief
+              ) : (
+                <span className="text-gray-600">No report available.</span>
+              )}
+            </div>
+          </section>
 
           <section className="flex h-[75vh] flex-col border border-[#333] bg-black">
             <div className="flex items-center justify-between border-b border-[#333] px-4 py-3 bg-[#0a0a0a]">
@@ -280,9 +299,9 @@ export default function TerminalDashboard() {
                     <div className="mb-2 flex items-center justify-between text-[10px]">
                       <div className="flex items-center gap-2 text-gray-500">
                         <span className={`${news.aiRating?.score && news.aiRating.score > 70 ? 'text-[#ff0000]' : 'text-gray-300'} font-bold`}>
-                          @{news.newsType.toUpperCase()}
+                          @{news.newsType ? news.newsType.toUpperCase() : 'NO DATA AVAILABLE AT THIS TIME'}
                         </span>
-                        <span>• {new Date(news.ts).toLocaleTimeString()}</span>
+                        <span>• {news.ts ? new Date(news.ts).toLocaleTimeString() : 'No data available at this time'}</span>
                       </div>
                       {news.aiRating?.score && (
                         <span className={`border ${news.aiRating.score > 70 ? 'border-[#ff0000] text-[#ff0000]' : 'border-[#333] text-gray-500'} px-1`}>
@@ -293,7 +312,7 @@ export default function TerminalDashboard() {
                     
                     <a href={news.link} target="_blank" rel="noopener noreferrer" className="block group-hover:text-white transition-colors">
                       <h3 className="mb-2 text-sm font-bold text-gray-200 leading-snug break-words">
-                        {news.text.split('\n')[0].replace(/<[^>]*>?/gm, '')} {/* Strip HTML tags jika ada */}
+                        {news.text ? news.text.split('\n')[0].replace(/<[^>]*>?/gm, '') : 'No data available at this time'}
                       </h3>
                       {news.aiRating?.summary && (
                         <p className="mb-3 text-[11px] text-gray-400 line-clamp-2 break-words">
@@ -314,7 +333,7 @@ export default function TerminalDashboard() {
                         </Link>
                       ))}
                       <span className="bg-[#111] border border-[#333] px-1 py-0.5 text-[9px] text-gray-600">
-                        {news.engineType.toUpperCase()}
+                        {news.engineType ? news.engineType.toUpperCase() : 'NO DATA AVAILABLE AT THIS TIME'}
                       </span>
                     </div>
                   </article>
@@ -329,39 +348,42 @@ export default function TerminalDashboard() {
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-3">
           
-          {/* Viral Radar Section */}
           <section className="border border-[#333] bg-black">
             <div className="flex items-center gap-2 border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
               <Crosshair className="h-4 w-4 text-[#ff0000]" />
               <h2>VIRAL RADAR</h2>
             </div>
             <div className="p-4 space-y-4">
-              {viralAnomalies.length > 0 ? viralAnomalies.map((anomaly, idx) => (
-                <Link 
-                  href={`/asset/${anomaly.symbol.toLowerCase()}`}
-                  key={idx} 
-                  className="flex items-center justify-between border-b border-[#222] pb-3 last:border-0 last:pb-0 hover:bg-[#050505] transition-colors p-1"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-white font-bold text-sm tracking-wider">${anomaly.symbol}</span>
-                    <span className="text-[10px] text-gray-500 uppercase">Growth Multiplier</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-500 font-bold bg-[#0a1a0a] px-1 border border-green-900">
-                      +{anomaly.growth}%
-                    </span>
-                    {anomaly.status === "VIRAL_ANOMALY" && (
-                      <span className="bg-[#ff0000] text-black text-[9px] font-black px-1 animate-pulse">
-                        ANOMALY
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              )) : (
+              {isViralLoading ? (
                 <div className="text-[10px] text-gray-500 flex items-center gap-2">
                   <RefreshCw className="h-3 w-3 animate-spin" />
                   Scanning signal patterns...
                 </div>
+              ) : viralAnomalies.length > 0 ? (
+                viralAnomalies.map((anomaly, idx) => (
+                  <Link 
+                    href={`/asset/${anomaly.symbol.toLowerCase()}`}
+                    key={idx} 
+                    className="flex items-center justify-between border-b border-[#222] pb-3 last:border-0 last:pb-0 hover:bg-[#050505] transition-colors p-1"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-white font-bold text-sm tracking-wider">${anomaly.symbol}</span>
+                      <span className="text-[10px] text-gray-500 uppercase">Growth Multiplier</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-500 font-bold bg-[#0a1a0a] px-1 border border-green-900">
+                        +{anomaly.growth}%
+                      </span>
+                      {anomaly.status === "VIRAL_ANOMALY" && (
+                        <span className="bg-[#ff0000] text-black text-[9px] font-black px-1 animate-pulse">
+                          ANOMALY
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="text-[10px] text-gray-500 italic">No viral anomalies detected.</div>
               )}
             </div>
           </section>
@@ -408,7 +430,6 @@ export default function TerminalDashboard() {
             </div>
           </section>
 
-          {/* Cyberpunk Decorative Element */}
           <div className="flex-1 border border-[#333] bg-dither p-4 flex items-end justify-end opacity-50 hidden md:flex min-h-[100px]">
              <div className="text-right">
                 <div className="text-[#ff0000] text-[10px] tracking-widest">SYS.OP.NORMAL</div>

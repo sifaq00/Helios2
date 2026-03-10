@@ -10,7 +10,8 @@ import {
   Activity, 
   BarChart2, 
   Zap,
-  GlobeLock
+  GlobeLock,
+  Share2
 } from "lucide-react";
 
 interface NewsItem {
@@ -198,12 +199,12 @@ export default function AssetDetail() {
       const typingInterval = setInterval(() => {
         if (currentIndex <= fullText.length) {
           setAiInsight(fullText.slice(0, currentIndex));
-          currentIndex++;
+          currentIndex += 3; // Menambah 3 karakter per tick agar animasi terasa jauh lebih cepat
         } else {
           clearInterval(typingInterval);
           setIsGenerating(false);
         }
-      }, 15);
+      }, 10); // Interval dipercepat ke 10ms (sebelumnya 15ms)
 
     } catch (error) {
       setAiInsight("[ERROR: AI_LINK_FAILURE] - Connection to Neural Network lost.");
@@ -269,7 +270,7 @@ export default function AssetDetail() {
                 <h2 className="font-bold tracking-widest text-[#ff0000]">NEURAL SYNTHESIS</h2>
               </div>
               
-              <div className="p-6 h-[400px] flex flex-col">
+              <div className="p-6 h-[400px] flex flex-col relative">
                 {!aiInsight && !isGenerating ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4">
                     <Activity className="h-12 w-12 text-gray-700 mb-2" />
@@ -284,17 +285,34 @@ export default function AssetDetail() {
                     </button>
                   </div>
                 ) : (
-                  <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar">
-                    <div className="space-y-1">
-                      {parseAIResponse(aiInsight)}
-                      {isGenerating && (
-                        <div className="flex items-center gap-1 mt-4">
-                          <span className="text-[#ff0000] font-bold animate-pulse">_</span>
-                          <span className="text-[#ff0000] text-xs">PROCESSING NEURAL DATA...</span>
-                        </div>
-                      )}
+                  <>
+                    <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar mb-4">
+                      <div className="space-y-1">
+                        {parseAIResponse(aiInsight)}
+                        {isGenerating && (
+                          <div className="flex items-center gap-1 mt-4">
+                            <span className="text-[#ff0000] font-bold animate-pulse">_</span>
+                            <span className="text-[#ff0000] text-xs">PROCESSING NEURAL DATA...</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                    {aiInsight && !isGenerating && (
+                      <div className="border-t border-[#ff000040] pt-4 mt-auto flex justify-end">
+                        <button 
+                          onClick={() => {
+                            const tweetText = `Alpha Detected for $${coin}! 📡\n\n${aiInsight.split('\n')[0].replace(/### /g, '')}\n\nAnalyze with Mail Man:`;
+                            const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(window.location.href)}`;
+                            window.open(shareUrl, '_blank');
+                          }}
+                          className="flex items-center gap-2 border border-[#ff0000] bg-[#ff000020] px-4 py-2 text-[10px] font-bold text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black tracking-widest uppercase shadow-[0_0_10px_rgba(255,0,0,0.1)]"
+                        >
+                          <Share2 className="h-3 w-3" />
+                          Broadcast Alpha
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </section>

@@ -33,6 +33,8 @@ export default function TerminalDashboard() {
   const [newsFeed, setNewsFeed] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viralAnomalies, setViralAnomalies] = useState<any[]>([]);
+  const [dailyBrief, setDailyBrief] = useState<string>("");
 
   const fetchNews = async () => {
     setIsLoading(true);
@@ -50,9 +52,38 @@ export default function TerminalDashboard() {
     }
   };
 
+  const fetchViralData = async () => {
+    try {
+      const res = await fetch('/api/viral-radar');
+      const data = await res.json();
+      if (data.active_anomalies) {
+        setViralAnomalies(data.active_anomalies);
+      }
+    } catch (err) {
+      console.error("Viral Radar offline", err);
+    }
+  };
+
+  const fetchDailyBrief = async () => {
+    try {
+      const res = await fetch('/api/daily-brief');
+      const data = await res.json();
+      if (data.brief) {
+        setDailyBrief(data.brief);
+      }
+    } catch (err) {
+      console.error("Daily Brief generation failed", err);
+    }
+  };
+
   useEffect(() => {
     fetchNews();
-    const interval = setInterval(fetchNews, 60000); // Polling 60 detik
+    fetchViralData();
+    fetchDailyBrief();
+    const interval = setInterval(() => {
+      fetchNews();
+      fetchViralData();
+    }, 60000); // Polling 60 detik
     return () => clearInterval(interval);
   }, []);
 
@@ -208,6 +239,23 @@ export default function TerminalDashboard() {
             CENTER COLUMN: RAW DATA STREAM
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-6">
+          {/* AI Intelligence Brief - Command Brief Card */}
+          {dailyBrief && (
+            <section className="border border-[#ff0000] bg-[#110000] p-4 relative overflow-hidden group">
+              {/* Scanline overlay */}
+              <div className="absolute inset-0 bg-gradient-to-b from-[#ff000010] to-transparent pointer-events-none"></div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-2 w-2 bg-[#ff0000] animate-ping"></div>
+                <h3 className="text-[11px] font-bold tracking-[0.3em] text-[#ff0000]">
+                  [SYSTEM_REPORT_{new Date().toLocaleDateString().replace(/\//g, '')}]
+                </h3>
+              </div>
+              <div className="relative z-10 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-line border-l border-[#ff000040] pl-3 italic">
+                {dailyBrief}
+              </div>
+            </section>
+          )}
+
           <section className="flex h-[75vh] flex-col border border-[#333] bg-black">
             <div className="flex items-center justify-between border-b border-[#333] px-4 py-3 bg-[#0a0a0a]">
               <div className="flex items-center gap-2">
@@ -281,6 +329,43 @@ export default function TerminalDashboard() {
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-3">
           
+          {/* Viral Radar Section */}
+          <section className="border border-[#333] bg-black">
+            <div className="flex items-center gap-2 border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
+              <Crosshair className="h-4 w-4 text-[#ff0000]" />
+              <h2>VIRAL RADAR</h2>
+            </div>
+            <div className="p-4 space-y-4">
+              {viralAnomalies.length > 0 ? viralAnomalies.map((anomaly, idx) => (
+                <Link 
+                  href={`/asset/${anomaly.symbol.toLowerCase()}`}
+                  key={idx} 
+                  className="flex items-center justify-between border-b border-[#222] pb-3 last:border-0 last:pb-0 hover:bg-[#050505] transition-colors p-1"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-white font-bold text-sm tracking-wider">${anomaly.symbol}</span>
+                    <span className="text-[10px] text-gray-500 uppercase">Growth Multiplier</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500 font-bold bg-[#0a1a0a] px-1 border border-green-900">
+                      +{anomaly.growth}%
+                    </span>
+                    {anomaly.status === "VIRAL_ANOMALY" && (
+                      <span className="bg-[#ff0000] text-black text-[9px] font-black px-1 animate-pulse">
+                        ANOMALY
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              )) : (
+                <div className="text-[10px] text-gray-500 flex items-center gap-2">
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  Scanning signal patterns...
+                </div>
+              )}
+            </div>
+          </section>
+
           <section className="border border-[#333] bg-black">
             <div className="flex items-center gap-2 border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
               <TrendingUp className="h-4 w-4 text-[#ff0000]" />

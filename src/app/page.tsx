@@ -86,24 +86,25 @@ export default function LandingPage() {
   return (
     <main className="scanlines min-h-screen bg-black text-white selection:bg-[#ff0000] selection:text-black font-mono relative overflow-hidden">
       
-      {/* Interactive Background Particles diletakkan di belakang konten */}
-      {!showSplash && <InteractiveBackground />}
-
       {showSplash ? (
         <SplashScreen onComplete={handleSplashComplete} />
       ) : (
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-12 md:py-24">
+        <>
+          {/* Interactive Background Particles diletakkan di belakang konten */}
+          <InteractiveBackground />
           
-          {/* Header / Nav minimalis */}
-          <nav className="flex items-center justify-between border-b border-[#333] pb-6 mb-16 relative z-20">
-            <div className="text-[#ff0000] font-bold tracking-widest text-xl crt-flicker">MM_SYS</div>
-            <Link 
-              href="/terminal" 
-              className="border border-[#ff0000] bg-black px-4 py-2 text-xs text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black uppercase tracking-widest backdrop-blur-sm"
-            >
-              [ Access Terminal ]
-            </Link>
-          </nav>
+          <div className="relative z-10 mx-auto max-w-6xl px-6 py-12 md:py-24">
+            
+            {/* Header / Nav minimalis */}
+            <nav className="flex items-center justify-between border-b border-[#333] pb-6 mb-16 relative z-20">
+              <div className="text-[#ff0000] font-bold tracking-widest text-xl crt-flicker">MM_SYS</div>
+              <Link 
+                href="/terminal" 
+                className="border border-[#ff0000] bg-black px-4 py-2 text-xs text-[#ff0000] transition-all hover:bg-[#ff0000] hover:text-black uppercase tracking-widest backdrop-blur-sm"
+              >
+                [ Access Terminal ]
+              </Link>
+            </nav>
 
           {/* Hero Section */}
           <div className="flex flex-col-reverse items-center justify-between gap-16 md:flex-row relative z-20">
@@ -196,7 +197,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-        </div>
+          </div>
+        </>
       )}
     </main>
   );

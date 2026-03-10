@@ -136,7 +136,7 @@ export default function LandingPage() {
               </div>
               
               <p className="max-w-md text-sm leading-relaxed text-gray-400">
-                Platform intelijen kripto bertenaga AI. Agregasi berita real-time, analisis sentimen, dan sinyal alpha bawah tanah. <span className="text-white bg-[#ff0000] px-1 font-bold">Zero noise.</span>
+                AI-powered crypto intelligence platform. Real-time news aggregation, sentiment analysis, and underground alpha signals. <span className="text-white bg-[#ff0000] px-1 font-bold">Zero noise.</span>
               </p>
 
               <div className="pt-4">

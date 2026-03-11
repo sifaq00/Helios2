@@ -530,33 +530,46 @@ export default function TerminalDashboard() {
                     <div className="h-8 w-px bg-gradient-to-b from-[#ff0000] to-[#333]"></div>
                   </div>
 
-                  {/* API Layer */}
-                  <div className="w-full max-w-4xl grid grid-cols-4 gap-4 mb-12 uppercase">
-                    {["/api/news", "/api/ai", "/api/daily-brief", "/api/viral-radar"].map(api => (
-                      <div key={api} className="border border-[#333] bg-[#050505] p-2 text-center">
-                        <div className="text-[8px] text-gray-600 mb-1">ENCRYPTED</div>
-                        <div className="text-[10px] text-gray-300 font-mono">{api}</div>
+                  {/* API Layer - Enhanced Aesthetic */}
+                  <div className="w-full max-w-4xl grid grid-cols-4 gap-6 mb-12 uppercase">
+                    {[
+                      { path: "/api/news", label: "DATA_FEED" },
+                      { path: "/api/ai", label: "NEURAL_INF" },
+                      { path: "/api/daily-brief", label: "INTEL_GEN" },
+                      { path: "/api/viral-radar", label: "ANOMALY_DET" }
+                    ].map(api => (
+                      <div key={api.path} className="group relative border border-[#333] bg-[#050505] p-3 text-center hover:border-[#ff0000] transition-all duration-300">
+                        <div className="absolute -top-1 -right-1 h-2 w-2 bg-[#ff0000] opacity-20 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="text-[7px] text-gray-600 mb-1 tracking-[0.2em] group-hover:text-[#ff0000]">REST_ENDPOINT</div>
+                        <div className="text-[11px] text-white font-black font-mono mb-1">{api.label}</div>
+                        <div className="text-[8px] text-gray-500 font-mono italic">{api.path}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Connectors to Neural Core */}
-                  <div className="flex justify-center w-full max-w-4xl -mt-12 mb-4">
-                    <div className="h-8 w-px bg-[#333]"></div>
+                  <div className="flex justify-center w-full max-w-4xl -mt-12 mb-6">
+                    <div className="h-12 w-px bg-gradient-to-b from-[#333] via-[#ff0000] to-[#ff0000]"></div>
                   </div>
 
-                  {/* Neural Core Layer */}
-                  <div className="w-full max-w-2xl border-2 border-dashed border-[#ff0000] p-6 bg-[#0a0000] relative group">
-                    <div className="absolute inset-0 bg-red-900/5 group-hover:bg-red-900/10 transition-colors"></div>
-                    <div className="text-[11px] text-[#ff0000] font-bold tracking-[0.4em] mb-4 text-center uppercase">NEURAL_CORE [INTELLIGENCE]</div>
-                    <div className="grid grid-cols-2 gap-8">
-                      <div className="border border-[#ff000040] p-3 text-center">
-                        <div className="text-[10px] text-white font-black mb-1">OPENROUTER API</div>
-                        <div className="text-[9px] text-gray-500 font-mono">Mistral Small / Intelligence Layer</div>
-                      </div>
-                      <div className="border border-[#ff000040] p-3 text-center">
-                        <div className="text-[10px] text-white font-black mb-1">OPENNEWS API</div>
-                        <div className="text-[9px] text-gray-500 font-mono">Raw News Stream / Data Source</div>
+                  {/* Neural Core Layer - Pulsing High-End Core */}
+                  <div className="w-full max-w-2xl border-2 border-[#ff0000] p-1 bg-black relative group shadow-[0_0_30px_rgba(255,0,0,0.1)]">
+                    <div className="border border-[#ff000040] p-6 bg-[#0a0000] relative overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,0,0.1)_0%,transparent_70%)] animate-pulse"></div>
+                      <div className="relative z-10">
+                        <div className="text-[12px] text-[#ff0000] font-black tracking-[0.6em] mb-6 text-center uppercase crt-flicker">NEURAL_INFRASTRUCTURE_V1</div>
+                        <div className="grid grid-cols-2 gap-8">
+                          <div className="group/node border border-[#ff000040] p-4 text-center bg-black/50 hover:bg-[#110000] transition-colors relative">
+                            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#ff0000]"></div>
+                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">OPENROUTER</div>
+                            <div className="text-[8px] text-gray-500 font-mono uppercase">MISTRAL_SMALL_CORE</div>
+                          </div>
+                          <div className="group/node border border-[#ff000040] p-4 text-center bg-black/50 hover:bg-[#110000] transition-colors relative">
+                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#ff0000]"></div>
+                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">OPENNEWS</div>
+                            <div className="text-[8px] text-gray-500 font-mono uppercase">REALTIME_INGESTION</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -564,27 +577,21 @@ export default function TerminalDashboard() {
               </div>
             </div>
 
-            {/* Bottom: The Transmission — aesthetic terminal layout */}
+            {/* Bottom: The Mission — aesthetic terminal layout */}
             <div className="border-t border-[#333] pt-12 space-y-12">
 
               {/* Header with glitch effect */}
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#ff000030] to-transparent blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative flex items-end justify-between border-b-2 border-[#ff0000] pb-4">
+                <div className="relative flex items-end justify-between border-b border-[#ff0000] pb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="h-1 w-8 bg-[#ff0000]"></span>
-                      <span className="text-[10px] text-[#ff0000] font-black tracking-[0.5em] uppercase">Phase_01 // Discovery</span>
+                      <span className="text-[10px] text-[#ff0000] font-black tracking-[0.5em] uppercase">SYSTEM_MANIFESTO</span>
                     </div>
                     <h3 className="text-3xl font-black text-white tracking-tighter uppercase italic leading-none">
-                      THE <span className="text-[#ff0000]">TRANSMISSION</span>
+                      THE <span className="text-[#ff0000]">MISSION</span>
                     </h3>
-                  </div>
-                  <div className="text-right hidden md:block">
-                    <div className="text-[10px] text-gray-500 font-mono mb-1">00:00:00:UTC</div>
-                    <div className="px-2 py-0.5 bg-[#110000] border border-[#ff0000] text-[#ff0000] text-[9px] font-bold animate-pulse">
-                      UPLINK_ESTABLISHED
-                    </div>
                   </div>
                 </div>
               </div>
@@ -593,20 +600,24 @@ export default function TerminalDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 
                 {/* Left: Narrative & Signal */}
-                <div className="lg:col-span-7 space-y-8">
+                <div className="lg:col-span-8 space-y-8">
                   <div className="relative">
-                    <p className="text-sm md:text-base leading-[1.8] text-gray-200 font-mono tracking-tight first-letter:text-2xl first-letter:font-black first-letter:text-[#ff0000] first-letter:mr-2">
-                      MAIL MAN is an autonomous AI system built for the intersection of cryptocurrency markets and predictive intelligence. We transform global market data into actionable signals through real-time aggregation and advanced neural analysis.
+                    <p className="text-lg md:text-xl font-bold text-white leading-relaxed tracking-tight border-l-4 border-[#ff0000] pl-6 py-2 uppercase">
+                      MAIL MAN is an <span className="text-[#ff0000]">autonomous neural system</span> quantifying market uncertainty by mapping the structural dynamics of crypto-driven markets.
                     </p>
-                    <div className="mt-8 relative p-8 border border-[#222] bg-[#050505] overflow-hidden">
-                      <div className="absolute -left-1 top-4 h-12 w-1 bg-[#ff0000]"></div>
-                      <p className="text-gray-400 leading-relaxed italic pr-4">
-                        "We don&apos;t just track crypto. We quantify market uncertainty &mdash; modeling volatility, detecting regime shifts, and mapping the structural dynamics of crypto-driven markets through proprietary simulation engines."
-                      </p>
-                      <div className="mt-4 flex items-center gap-4">
-                        <div className="h-px flex-1 bg-gradient-to-r from-[#333] to-transparent"></div>
-                        <span className="text-[9px] text-[#ff0000] font-bold tracking-widest uppercase opacity-50">Core_Engine_V.01</span>
-                      </div>
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="bg-[#050505] border border-[#111] p-4 hover:border-[#ff000030] transition-colors">
+                          <span className="text-[#ff0000] text-[10px] font-black block mb-2 tracking-widest">// RAW_DATA_INTERCEPT</span>
+                          <p className="text-xs text-gray-400 leading-relaxed italic">
+                            Constructing actionable signals through real-time news aggregation, anomaly detection, and advanced AI analysis.
+                          </p>
+                       </div>
+                       <div className="bg-[#050505] border border-[#111] p-4 hover:border-[#ff000030] transition-colors">
+                          <span className="text-[#ff0000] text-[10px] font-black block mb-2 tracking-widest">// REGIME_SHIFT_DETECTION</span>
+                          <p className="text-xs text-gray-400 leading-relaxed italic">
+                            Modeling volatility and mapping behavioral signal dynamics through proprietary simulation engines.
+                          </p>
+                       </div>
                     </div>
                   </div>
                 </div>

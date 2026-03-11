@@ -8,8 +8,6 @@
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/omnicima/mail-man)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-Official Terminal: [Your Website Here]
-
 CA: [Contract Address Here]
 
 Twitter: [https://x.com/mailmanonx](https://x.com/mailmanonx)

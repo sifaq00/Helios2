@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { 
   Terminal, 
   AlertTriangle, 
@@ -13,7 +14,8 @@ import {
   Crosshair,
   Github,
   Twitter,
-  Video // <-- Icon baru untuk Live Video
+  Video,
+  Cpu
 } from "lucide-react";
 
 interface NewsItem {
@@ -162,8 +164,17 @@ export default function TerminalDashboard() {
       {/* Top Navigation Bar */}
       <nav className="sticky top-0 z-40 flex items-center justify-between border-b border-[#ff0000] bg-black/90 px-6 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-[#ff0000] font-black tracking-widest text-xl crt-flicker">
-            MM_SYS
+          <Link href="/" className="flex items-center gap-3 text-[#ff0000] font-black tracking-widest text-xl crt-flicker group">
+            <div className="relative h-8 w-8 overflow-hidden border border-[#ff0000] bg-black">
+              <Image 
+                src="/logo.jpeg" 
+                alt="Logo" 
+                fill 
+                sizes="32px"
+                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
+              />
+            </div>
+            <span>MAIL MAN</span>
           </Link>
           <span className="hidden text-xs text-gray-500 md:inline-block">
             // STATUS: {isLoading ? <span className="text-yellow-500 animate-pulse">INTERCEPTING DATA...</span> : <span className="text-green-500">SECURE UPLINK</span>}
@@ -196,37 +207,27 @@ export default function TerminalDashboard() {
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 p-6 md:grid-cols-12 md:p-8">
         
         {/* =========================================
-            LEFT COLUMN: BREAKING NEWS, VIDEO & AI SIGNALS 
+            LEFT COLUMN: SYSTEM REPORT & AI SIGNALS 
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-3">
           
-          {/* =====================
-              NEW: LIVE VIDEO FEED 
-              ===================== */}
-          <section className="border border-[#333] bg-black shadow-[0_0_10px_rgba(255,0,0,0.05)]">
-            <div className="flex items-center justify-between border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
-              <div className="flex items-center gap-2">
-                <Video className="h-4 w-4 text-[#ff0000] animate-pulse" />
-                <h2>LIVE_UPLINK</h2>
-              </div>
-              <span className="text-[9px] bg-[#ff0000] text-black px-1 font-bold animate-pulse">REC</span>
+          <section className="border border-[#ff0000] bg-[#110000] p-4 relative overflow-hidden group min-h-[100px]">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#ff000010] to-transparent pointer-events-none"></div>
+            
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-1.5 w-1.5 bg-[#ff0000] animate-ping"></div>
+              <h3 className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
+                System_Report_{new Date().toLocaleDateString().replace(/\//g, '')}
+              </h3>
             </div>
-            {/* Wrapper Video - Filter CSS memberikan efek Cyberpunk (Hacker Cam) */}
-            <div className="relative aspect-video w-full overflow-hidden bg-[#050505] p-1 group">
-              {/* Scanline & Red Overlay */}
-              <div className="absolute inset-0 z-10 pointer-events-none bg-dither opacity-10"></div>
-              <div className="absolute inset-0 z-10 pointer-events-none bg-[#ff0000] mix-blend-multiply opacity-20 group-hover:opacity-10 transition-opacity"></div>
-              
-              <iframe
-                src={`https://www.youtube.com/embed/${LIVE_STREAM_ID}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0`}
-                className="w-full h-full opacity-80 grayscale contrast-125"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <div className="bg-[#0a0a0a] p-2 flex justify-between items-center text-[9px] text-gray-500 border-t border-[#333]">
-               <span className="flex items-center gap-1"><Activity className="h-3 w-3 text-green-500" /> SAT_LINK: STABLE</span>
-               <span className="uppercase text-[#ff0000]">CH: OMEGA-7</span>
+            <div className="relative z-10 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-line border-l border-[#ff000040] pl-3 italic">
+              {isBriefLoading ? (
+                <span className="animate-pulse text-gray-500">Decrypting daily intel...</span>
+              ) : dailyBrief ? (
+                dailyBrief
+              ) : (
+                <span className="text-gray-600">No report available.</span>
+              )}
             </div>
           </section>
 
@@ -286,30 +287,46 @@ export default function TerminalDashboard() {
         </div>
 
         {/* =========================================
-            CENTER COLUMN: RAW DATA STREAM
+            CENTER COLUMN: RAW DATA STREAM & LIVE UPLINK
             ========================================= */}
         <div className="flex flex-col gap-6 md:col-span-6">
-          {/* AI Intelligence Brief */}
-          <section className="border border-[#ff0000] bg-[#110000] p-4 relative overflow-hidden group min-h-[100px]">
-            <div className="absolute inset-0 bg-gradient-to-b from-[#ff000010] to-transparent pointer-events-none"></div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-2 w-2 bg-[#ff0000] animate-ping"></div>
-              <h3 className="text-[11px] font-bold tracking-[0.3em] text-[#ff0000]">
-                [SYSTEM_REPORT_{new Date().toLocaleDateString().replace(/\//g, '')}]
-              </h3>
+          {/* LIVE_UPLINK moved from Left to Center */}
+          <section className="border border-[#333] bg-black shadow-[0_0_10px_rgba(255,0,0,0.05)]">
+            <div className="flex items-center justify-between border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
+              <div className="flex items-center gap-2">
+                <Video className="h-4 w-4 text-[#ff0000] animate-pulse" />
+                <h2>LIVE_UPLINK (GLOBAL_MATRIX)</h2>
+              </div>
+              <span className="text-[9px] bg-[#ff0000] text-black px-1 font-bold animate-pulse">REC</span>
             </div>
-            <div className="relative z-10 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-line border-l border-[#ff000040] pl-3 italic">
-              {isBriefLoading ? (
-                <span className="animate-pulse text-gray-500">Decrypting daily intel...</span>
-              ) : dailyBrief ? (
-                dailyBrief
-              ) : (
-                <span className="text-gray-600">No report available.</span>
-              )}
+            {/* Wrapper Video — padding-bottom trick gives ratio height, iframe wider than container to eliminate letterbox */}
+            <div
+              className="relative w-full overflow-hidden bg-[#050505] group"
+              style={{ paddingBottom: '60%' }}
+            >
+              {/* Scanline & Red Overlay */}
+              <div className="absolute inset-0 z-10 pointer-events-none bg-dither opacity-10"></div>
+              {/* HUD corner markers */}
+              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-[#ff0000] z-20 pointer-events-none"></div>
+              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-[#ff0000] z-20 pointer-events-none"></div>
+              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-[#ff0000] z-20 pointer-events-none"></div>
+              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-[#ff0000] z-20 pointer-events-none"></div>
+              {/* Centered wider iframe — width = 85 * 16/9 = 151% to fill height without black bars */}
+              <iframe
+                src={`https://www.youtube.com/embed/${LIVE_STREAM_ID}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=1&playlist=${LIVE_STREAM_ID}&loop=1`}
+                className="absolute top-0 left-1/2 -translate-x-1/2 h-full opacity-90 contrast-125"
+                style={{ width: '107%' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <div className="bg-[#0a0a0a] p-2 flex justify-between items-center text-[9px] text-gray-500 border-t border-[#333]">
+               <span className="flex items-center gap-1"><Activity className="h-3 w-3 text-green-500" /> SAT_LINK: STABLE</span>
+               <span className="uppercase text-[#ff0000]">NET_LATENCY: 24MS</span>
             </div>
           </section>
 
-          <section className="flex h-[75vh] flex-col border border-[#333] bg-black">
+          <section className="flex h-[600px] flex-col border border-[#333] bg-black">
             <div className="flex items-center justify-between border-b border-[#333] px-4 py-3 bg-[#0a0a0a]">
               <div className="flex items-center gap-2">
                 <Terminal className="h-5 w-5 text-[#ff0000]" />
@@ -338,7 +355,7 @@ export default function TerminalDashboard() {
                         <span>• {news.ts ? new Date(news.ts).toLocaleTimeString() : 'No data available at this time'}</span>
                       </div>
                       {news.aiRating?.score && (
-                        <span className={`border ${news.aiRating.score > 70 ? 'border-[#ff0000] text-[#ff0000]' : 'border-[#333] text-gray-500'} px-1`}>
+                        <span className="border border-[#ff0000] text-[#ff0000] px-1 font-bold">
                           IMPACT: {news.aiRating.score}
                         </span>
                       )}
@@ -362,12 +379,12 @@ export default function TerminalDashboard() {
                         </span>
                       )}
                       {news.coins?.map(coin => (
-                        <Link href={`/asset/${coin.symbol.toLowerCase()}`} key={coin.symbol} className="bg-[#111] border border-[#333] px-1 py-0.5 text-[9px] text-gray-300 hover:border-[#ff0000] hover:text-[#ff0000] transition-colors cursor-pointer">
+                        <Link href={`/asset/${coin.symbol.toLowerCase()}`} key={coin.symbol} className="bg-[#111] border border-[#ff0000] px-1 py-0.5 text-[9px] text-[#ff0000] font-bold hover:bg-[#ff0000] hover:text-black transition-colors cursor-pointer">
                           ${coin.symbol}
                         </Link>
                       ))}
-                      <span className="bg-[#111] border border-[#333] px-1 py-0.5 text-[9px] text-gray-600">
-                        {news.engineType ? news.engineType.toUpperCase() : 'NO DATA AVAILABLE AT THIS TIME'}
+                      <span className="bg-[#111] border border-[#ff0000] px-1 py-0.5 text-[9px] text-[#ff0000] font-bold">
+                        {news.engineType ? news.engineType.toUpperCase() : 'NEWS'}
                       </span>
                     </div>
                   </article>
@@ -472,6 +489,166 @@ export default function TerminalDashboard() {
           </div>
         </div>
 
+      </div>
+
+      {/* =========================================
+          HOW IT WORKS SECTION
+          ========================================= */}
+      <div className="mx-auto max-w-[1400px] p-6 md:p-8">
+        <section className="border border-[#333] bg-black overflow-hidden shadow-[0_0_30px_rgba(255,0,0,0.05)]">
+          <div className="flex items-center gap-2 border-b border-[#333] px-4 py-3 text-white bg-[#0a0a0a] tracking-[0.3em] text-sm font-bold border-l-4 border-l-[#ff0000]">
+            <Cpu className="h-4 w-4 text-[#ff0000]" />
+            <h2>SYSTEM_CORE_MANIFEST // PROTOCOL_V2</h2>
+          </div>
+          
+          <div className="p-8 space-y-16">
+            {/* Top: Architecture Diagram (Full Width styled) */}
+            <div className="relative">
+              <div className="absolute -top-4 left-6 bg-black px-3 py-1 border border-[#ff0000] text-[10px] text-[#ff0000] font-black z-10 tracking-[0.2em]">
+                SYSTEM_ARCHITECTURE_TOPOLOGY
+              </div>
+              <div className="border border-[#333] p-10 bg-[#020202] relative overflow-hidden">
+                {/* Background Grid Pattern */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,0,0,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+                
+                <div className="relative z-10 flex flex-col items-center">
+                  
+                  {/* UI Layer */}
+                  <div className="w-full max-w-2xl border border-[#ff0000] bg-black p-4 mb-12 relative shadow-[0_0_15px_rgba(255,0,0,0.1)]">
+                    <div className="text-[10px] text-[#ff0000] font-bold mb-3 border-b border-[#ff000020] pb-1 uppercase tracking-widest">USER_INTERFACE [MM_SYS]</div>
+                    <div className="flex justify-around gap-4 text-[11px] font-mono text-white">
+                      <div className="px-3 py-1 bg-[#111] border border-[#333]">Terminal Dashboard</div>
+                      <div className="px-3 py-1 bg-[#111] border border-[#333]">Viral Radar</div>
+                      <div className="px-3 py-1 bg-[#111] border border-[#333]">Alpha Signals Panel</div>
+                    </div>
+                  </div>
+
+                  {/* Connectors to API */}
+                  <div className="flex justify-around w-full max-w-2xl px-10 -mt-12 mb-4">
+                    <div className="h-8 w-px bg-gradient-to-b from-[#ff0000] to-[#333]"></div>
+                    <div className="h-8 w-px bg-gradient-to-b from-[#ff0000] to-[#333]"></div>
+                    <div className="h-8 w-px bg-gradient-to-b from-[#ff0000] to-[#333]"></div>
+                  </div>
+
+                  {/* API Layer */}
+                  <div className="w-full max-w-4xl grid grid-cols-4 gap-4 mb-12 uppercase">
+                    {["/api/news", "/api/ai", "/api/daily-brief", "/api/viral-radar"].map(api => (
+                      <div key={api} className="border border-[#333] bg-[#050505] p-2 text-center">
+                        <div className="text-[8px] text-gray-600 mb-1">ENCRYPTED</div>
+                        <div className="text-[10px] text-gray-300 font-mono">{api}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Connectors to Neural Core */}
+                  <div className="flex justify-center w-full max-w-4xl -mt-12 mb-4">
+                    <div className="h-8 w-px bg-[#333]"></div>
+                  </div>
+
+                  {/* Neural Core Layer */}
+                  <div className="w-full max-w-2xl border-2 border-dashed border-[#ff0000] p-6 bg-[#0a0000] relative group">
+                    <div className="absolute inset-0 bg-red-900/5 group-hover:bg-red-900/10 transition-colors"></div>
+                    <div className="text-[11px] text-[#ff0000] font-bold tracking-[0.4em] mb-4 text-center uppercase">NEURAL_CORE [INTELLIGENCE]</div>
+                    <div className="grid grid-cols-2 gap-8">
+                      <div className="border border-[#ff000040] p-3 text-center">
+                        <div className="text-[10px] text-white font-black mb-1">OPENROUTER API</div>
+                        <div className="text-[9px] text-gray-500 font-mono">Mistral Small / Intelligence Layer</div>
+                      </div>
+                      <div className="border border-[#ff000040] p-3 text-center">
+                        <div className="text-[10px] text-white font-black mb-1">OPENNEWS API</div>
+                        <div className="text-[9px] text-gray-500 font-mono">Raw News Stream / Data Source</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom: The Transmission — aesthetic terminal layout */}
+            <div className="border-t border-[#333] pt-12 space-y-12">
+
+              {/* Header with glitch effect */}
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#ff000030] to-transparent blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative flex items-end justify-between border-b-2 border-[#ff0000] pb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="h-1 w-8 bg-[#ff0000]"></span>
+                      <span className="text-[10px] text-[#ff0000] font-black tracking-[0.5em] uppercase">Phase_01 // Discovery</span>
+                    </div>
+                    <h3 className="text-3xl font-black text-white tracking-tighter uppercase italic leading-none">
+                      THE <span className="text-[#ff0000]">TRANSMISSION</span>
+                    </h3>
+                  </div>
+                  <div className="text-right hidden md:block">
+                    <div className="text-[10px] text-gray-500 font-mono mb-1">00:00:00:UTC</div>
+                    <div className="px-2 py-0.5 bg-[#110000] border border-[#ff0000] text-[#ff0000] text-[9px] font-bold animate-pulse">
+                      UPLINK_ESTABLISHED
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Aesthetic Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                {/* Left: Narrative & Signal */}
+                <div className="lg:col-span-7 space-y-8">
+                  <div className="relative">
+                    <p className="text-sm md:text-base leading-[1.8] text-gray-200 font-mono tracking-tight first-letter:text-2xl first-letter:font-black first-letter:text-[#ff0000] first-letter:mr-2">
+                      MAIL MAN is an autonomous AI system built for the intersection of cryptocurrency markets and predictive intelligence. We transform global market data into actionable signals through real-time aggregation and advanced neural analysis.
+                    </p>
+                    <div className="mt-8 relative p-8 border border-[#222] bg-[#050505] overflow-hidden">
+                      <div className="absolute -left-1 top-4 h-12 w-1 bg-[#ff0000]"></div>
+                      <p className="text-gray-400 leading-relaxed italic pr-4">
+                        "We don&apos;t just track crypto. We quantify market uncertainty &mdash; modeling volatility, detecting regime shifts, and mapping the structural dynamics of crypto-driven markets through proprietary simulation engines."
+                      </p>
+                      <div className="mt-4 flex items-center gap-4">
+                        <div className="h-px flex-1 bg-gradient-to-r from-[#333] to-transparent"></div>
+                        <span className="text-[9px] text-[#ff0000] font-bold tracking-widest uppercase opacity-50">Core_Engine_V.01</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Technical Matrix (Non-table approach) */}
+                <div className="lg:col-span-5 relative">
+                  <div className="absolute inset-0 bg-dither opacity-10 pointer-events-none"></div>
+                  <div className="space-y-4">
+                    <div className="text-[11px] font-black text-[#ff0000] mb-6 tracking-[0.3em] flex items-center gap-2">
+                       <Activity className="h-3 w-3" /> SYSTEM_SPECIFICATIONS
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        { label: "KERNEL", val: "v4.21.0-MM", color: "text-[#ff0000]" },
+                        { label: "LATENCY", val: "24MS / NOMINAL", color: "text-white" },
+                        { label: "NEURAL", val: "MISTRAL-SM", color: "text-white" },
+                        { label: "UPTIME", val: "99.97% LIVE", color: "text-green-500" },
+                        { label: "REGION", val: "GLOBAL_MESH", color: "text-white" },
+                        { label: "THREAD", val: "X-64_PARALLEL", color: "text-white" }
+                      ].map((spec, i) => (
+                        <div key={i} className="group relative bg-[#080808] border border-[#111] p-3 hover:border-[#ff000040] transition-colors">
+                          <div className="text-[8px] text-gray-600 font-mono mb-1 uppercase tracking-tighter">{spec.label}</div>
+                          <div className={`text-xs font-black font-mono transition-transform group-hover:translate-x-1 ${spec.color}`}>{spec.val}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-8 border-t border-[#111] pt-6 flex flex-wrap gap-2">
+                      {["RL_MODELS", "GPU_ACCEL", "REALTIME_TX", "SENTIMENT_v2"].map(tag => (
+                        <span key={tag} className="text-[8px] border border-[#222] px-2 py-0.5 text-gray-500 font-mono tracking-widest">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );

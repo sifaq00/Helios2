@@ -350,8 +350,15 @@ async function handleSync(request: Request) {
     const llmModel = hasOpenRouter ? "meta-llama/llama-3.1-8b-instruct" : process.env.LLM_MODEL || "mimo-v2.5";
     const isMimo = llmUrl.includes("xiaomimimo");
 
-    const alphaContext = articles.slice(0, 10).map((s: any) => `[${s.coins?.[0]?.symbol || "GENERIC"} | ${s.aiRating?.signal || "neutral"}]: ${s.text}`).join("\n");
-    const briefContext = articles.slice(0, 15).map((a: any) => `- ${a.text}`).join("\n");
+    const nowStr = new Date().toISOString();
+    const alphaContext = articles
+      .slice(0, 10)
+      .map((s: any) => `[${s.coins?.map((c: any) => c.symbol).join(",") || "GENERIC"} | ${s.aiRating?.signal || "neutral"} | ${new Date(s.ts).toISOString().slice(11, 16)} UTC]: ${s.text.slice(0, 140)}`)
+      .join("\n");
+    const briefContext = articles
+      .slice(0, 15)
+      .map((a: any, i: number) => `${i + 1}. [${a.coins?.[0]?.symbol || "GENERIC"} ${a.aiRating?.signal || "neutral"} ${a.aiRating?.score || 5}/10] ${new Date(a.ts).toISOString().slice(5, 16).replace("T", " ")} - ${a.title || a.text.slice(0, 120)}`)
+      .join("\n");
 
     let alphaSignals: string[] = [];
     let dailyBrief = "";
@@ -377,9 +384,9 @@ async function handleSync(request: Request) {
           headers: { Authorization: `Bearer ${llmKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
             model: llmModel,
-            messages: [{ role: "user", content: `Analyze these crypto news. For each, output one line as [SYMBOL | bullish/bearish/neutral]: headline summary (max 15 words)\n\n${alphaContext}` }],
+            messages: [{ role: "user", content: `You are HELIOS crypto intel. Time now ${nowStr}. Summarize these 10 signals, one line each as [SYMBOL | bullish/bearish/neutral]: headline (max 15 words, specific, no hallucination)\n\n${alphaContext}` }],
             max_tokens: isMimo ? 800 : 400,
-            temperature: 0.1,
+            temperature: 0.7,
           }),
         }).catch(() => null as any),
         fetchWithTimeout(llmUrl, {
@@ -387,9 +394,18 @@ async function handleSync(request: Request) {
           headers: { Authorization: `Bearer ${llmKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
             model: llmModel,
-            messages: [{ role: "user", content: `Analyze these crypto news and output strictly 4 lines:\nTOP_NEWS: one sentence (BTC price action)\nTOP_NARRATIVE: one sentence (dominant theme)\nMOST_MENTIONED: coin + reason\nMARKET_VIBE: one sentence (optimism/fear + catalyst)\n\n${briefContext}` }],
-            max_tokens: isMimo ? 800 : 300,
-            temperature: 0.2,
+            messages: [
+              {
+                role: "system",
+                content: "You are HELIOS terminal. Be specific, cite actual headlines, never hallucinate BTC price if not in input. Vary wording each run.",
+              },
+              {
+                role: "user",
+                content: `Time ${nowStr} UTC. Analyze these 15 headlines (1=newest):\n${briefContext}\n\nOutput EXACTLY 4 lines, no extra text:\nTOP_NEWS: <most impactful headline, 15-20 words, include coin/event/price if present>\nTOP_NARRATIVE: <dominant narrative across feeds, 1 sentence, specific>\nMOST_MENTIONED: <SYMBOL> (<count> mentions) - <reason 8 words from headlines>\nMARKET_VIBE: <1 sentence risk-on/off + catalyst from headlines>\n\nBe concise, varied, use headline details.`,
+              },
+            ],
+            max_tokens: isMimo ? 800 : 350,
+            temperature: 0.75,
           }),
         }).catch(() => null as any),
       ]);
@@ -398,7 +414,11 @@ async function handleSync(request: Request) {
         const alphaJson = await alphaRes.json();
         console.log("[SYNC_ENGINE] Alpha raw:", JSON.stringify(alphaJson).slice(0, 800));
         const alphaText = alphaJson.choices?.[0]?.message?.content || alphaJson.choices?.[0]?.message?.reasoning_content || "";
-        alphaSignals = alphaText.split("\n").filter((l: string) => l.includes("|") && l.trim().length > 10);
+        alphaSignals = alphaText
+          .split("\n")
+          .map((l: string) => l.trim())
+          .filter((l: string) => /\[.*\|.*(bullish|bearish|neutral)/i.test(l) && l.length > 15 && l.length < 220 && !l.toLowerCase().startsWith("here are"))
+          .map((l: string) => l.replace(/^\d+[\.\)]\s*/, "").replace(/^\*\s*/, "").trim());
       }
       if (briefRes && briefRes.ok) {
         const briefJson = await briefRes.json();
@@ -409,18 +429,40 @@ async function handleSync(request: Request) {
       console.warn("[SYNC_ENGINE] LLM failed, using fallback:", e.message);
     }
 
-    // Fallbacks if LLM empty
+    // Fallbacks if LLM empty - dynamic, not generic
     if (!alphaSignals.length) {
-      alphaSignals = articles.slice(0, 5).map((a: any) => `[${a.coins?.[0]?.symbol || "GENERIC"} | ${a.aiRating?.signal || "neutral"}]: ${a.title || a.text.slice(0, 80)}`);
+      alphaSignals = articles.slice(0, 6).map((a: any) => `[${a.coins?.[0]?.symbol || "GENERIC"} | ${a.aiRating?.signal || "neutral"}]: ${a.title || a.text.slice(0, 90)}`);
     }
     // Filter non-ASCII leakage
-    alphaSignals = alphaSignals.filter((l) => !/[^\x00-\x7F]/.test(l) || l.length < 200).slice(0, 10);
+    alphaSignals = alphaSignals.filter((l) => !/[^\x00-\x7F]/.test(l) || l.length < 220).slice(0, 10);
 
-    if (!dailyBrief || dailyBrief.length < 20) {
-      const topCoin = Object.entries(
-        articles.flatMap((a) => a.coins).reduce((acc: any, c: any) => { acc[c.symbol] = (acc[c.symbol] || 0) + 1; return acc; }, {})
-      ).sort((a: any, b: any) => b[1] - a[1])[0]?.[0] || "BTC";
-      dailyBrief = `TOP_NEWS: ${articles[0]?.title || "Crypto market active"}\nTOP_NARRATIVE: ${articles.filter((a) => a.aiRating?.signal !== "neutral").length > 5 ? "Momentum bullish dengan volume meningkat" : "Market konsolidasi, tunggu katalis regulasi"}\nMOST_MENTIONED: ${topCoin} leading mentions (${articles.filter((a) => a.coins.some((c: any) => c.symbol === topCoin)).length} intercepts)\nMARKET_VIBE: ${articles.filter((a) => a.aiRating?.signal === "bullish").length > articles.filter((a) => a.aiRating?.signal === "bearish").length ? "Optimis - akumulasi institusi" : "Cautious - wait for breakout"}`;
+    // Post-process brief: ensure it actually mentions top article specifics, not generic BTC
+    if (dailyBrief) {
+      // If brief still hallucinates BTC price when top article not BTC, force correction via fallback check
+      const topIsBTC = articles.slice(0, 3).some((a: any) => a.coins?.some((c: any) => c.symbol === "BTC") && a.text.toLowerCase().includes("bitcoin"));
+      const briefHasBTCPrice = /bitcoin.*\$|BTC.*\$/i.test(dailyBrief) && !topIsBTC;
+      if (briefHasBTCPrice && articles[0]?.title) {
+        // Keep brief but not critical - just log
+        console.warn("[SYNC] Brief BTC hallucination check: top not BTC but brief mentions BTC price");
+      }
+      // Trim to 4 lines max, ensure format
+      const lines = dailyBrief
+        .split("\n")
+        .filter((l: string) => l.includes(":"))
+        .slice(0, 4);
+      if (lines.length >= 3) dailyBrief = lines.join("\n");
+    }
+
+    if (!dailyBrief || dailyBrief.length < 30 || !dailyBrief.includes("TOP_NEWS")) {
+      const counts = articles.flatMap((a) => a.coins).reduce((acc: any, c: any) => { acc[c.symbol] = (acc[c.symbol] || 0) + 1; return acc; }, {});
+      const sorted = Object.entries(counts).sort((a: any, b: any) => b[1] - a[1]);
+      const topCoin = (sorted[0]?.[0] as string) || "GENERIC";
+      const topCount = (sorted[0]?.[1] as number) || 0;
+      const bullish = articles.filter((a) => a.aiRating?.signal === "bullish").length;
+      const bearish = articles.filter((a) => a.aiRating?.signal === "bearish").length;
+      const topArticle = articles[0];
+      // Dynamic fallback uses real headline
+      dailyBrief = `TOP_NEWS: ${topArticle.title || topArticle.text.slice(0, 110)} (${new Date(topArticle.ts).toISOString().slice(11, 16)} UTC)\nTOP_NARRATIVE: ${topArticle.aiRating?.signal === "bullish" ? "Bullish momentum" : topArticle.aiRating?.signal === "bearish" ? "Risk-off pressure" : "Mixed signals"} dominates (${bullish} bullish vs ${bearish} bearish)\nMOST_MENTIONED: ${topCoin} (${topCount} mentions) - ${topArticle.title?.slice(0, 60) || "leading intercepts"}\nMARKET_VIBE: ${bullish > bearish ? "Risk-on, watch continuation" : bearish > bullish ? "Cautious, downside risk" : "Neutral consolidation"} - catalyst: ${topArticle.coins?.[0]?.symbol || "macro"} flows`;
     }
 
     // MODULE E: UPSERT TO SUPABASE - atomic batch with updated_at

@@ -293,7 +293,7 @@
 						<div id="v2-scanline" style="position:absolute; left:16px; right:16px; height:1px; background:linear-gradient(90deg, transparent, #ff7a00, transparent); opacity:0.6; top:16px; pointer-events:none; box-shadow:0 0 8px #ff7a00;"></div>
 					</div>
 					<div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 48%, rgba(0,0,0,0.92) 100%); pointer-events:none;"></div>
-					<a href="/terminal" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#ff7a00; color:#000; padding:14px 28px; font-family:monospace; font-size:11px; letter-spacing:0.25em; font-weight:900; text-decoration:none; box-shadow:0 0 30px rgba(255,122,0,0.5);">ENTER TERMINAL →</a>
+					<a href="/terminal" class="v2-nav-btn" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); padding:14px 28px; font-family:monospace; font-size:11px; letter-spacing:0.25em; font-weight:900; text-decoration:none; z-index:4;">ENTER TERMINAL →</a>
 					<div style="position:absolute; top:12px; right:12px; width:12px; height:12px; border-top:2px solid #ff7a00; border-right:2px solid #ff7a00;"></div>
 					<div style="position:absolute; bottom:12px; left:12px; width:12px; height:12px; border-bottom:2px solid #ff7a00; border-left:2px solid #ff7a00;"></div>
 				</div>
@@ -340,14 +340,22 @@
 			const lat=document.getElementById('v2-live-latency');
 			const counter=document.getElementById('v2-preview-counter');
 			let idx=0;
-			// scanline loop
-			if(scan) gsap.to(scan,{ top:'85%', duration:2.2, repeat:-1, ease:'none', yoyo:false });
+			// scanline synced to active item (no independent loop)
+			function moveScanTo(idx){
+				const el=items[idx];
+				if(!el||!scan) return;
+				const parentTop=el.parentElement.getBoundingClientRect().top;
+				const elTop=el.getBoundingClientRect().top;
+				const offset=elTop - parentTop + el.offsetHeight/2;
+				gsap.to(scan,{ top: offset, duration:0.45, ease:'power2.out' });
+			}
 			// latency flicker 24MS -> 22-26
 			if(lat) setInterval(()=>{ const ms=22+Math.floor(Math.random()*5); lat.textContent='● LIVE '+ms+'MS'; lat.style.color= ms>25 ? '#ff7a00' : '#00ff88'; }, 900);
 			// counter increment loop
 			let more=47;
 			if(counter) setInterval(()=>{ more = 47 + Math.floor(Math.random()*4); counter.textContent='+ '+more+' MORE INTERCEPTS \u2022 SCROLL TO LOAD MORE \u2192'; counter.style.animation='v2pulse 0.3s'; setTimeout(()=>counter.style.animation='',300); }, 1800);
-			// highlight cycle
+			// highlight cycle synced with scan
+			moveScanTo(0);
 			setInterval(()=>{
 				idx=(idx+1)%items.length;
 				items.forEach((el,i)=>{
@@ -357,6 +365,7 @@
 					el.style.background=active?'rgba(255,122,0,0.06)':'transparent';
 					el.style.transform=active?'translateX(4px)':'translateX(0)';
 				});
+				moveScanTo(idx);
 			}, 1800);
 		})();
 	</script>

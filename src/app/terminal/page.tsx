@@ -170,7 +170,7 @@ export default function TerminalDashboard() {
           <Link href="/" className="flex items-center gap-3 text-[#ff7a00] font-black tracking-widest text-xl crt-flicker group">
             <div className="relative h-8 w-8 overflow-hidden border border-[#ff7a00] bg-black">
               <Image 
-                src="/logo.png" 
+                src="/logo.webp" 
                 alt="Logo" 
                 fill 
                 sizes="32px"
@@ -348,8 +348,8 @@ export default function TerminalDashboard() {
                   [CRITICAL_FAILURE]: {error}
                 </div>
               ) : (
-                newsFeed.map((news) => (
-                  <article key={news.id} className="py-4 first:pt-0 hover:bg-[#050505] transition-colors group">
+                newsFeed.map((news, idx) => (
+                  <article key={news.id || idx} className="py-4 first:pt-0 hover:bg-[#050505] transition-colors group">
                     <div className="mb-2 flex items-center justify-between text-[10px]">
                       <div className="flex items-center gap-2 text-gray-500">
                         <span className={`${news.aiRating?.score && news.aiRating.score > 70 ? 'text-[#ff7a00]' : 'text-gray-300'} font-bold`}>

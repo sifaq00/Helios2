@@ -283,7 +283,7 @@ export default function LandingPage() {
             <div className="relative z-10 w-80 h-80 border border-[#ff7a00]/25 bg-black/60 backdrop-blur-xl overflow-hidden group hover:border-[#ff7a00]/60 transition-all duration-700">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,122,0,.1)_0%,transparent_60%)]" />
               {/* Logo */}
-              <Image src="/logo.png" alt="HELIOS" fill className="object-cover opacity-80 mix-blend-lighten group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+              <Image src="/logo.webp" alt="HELIOS" fill className="object-cover opacity-80 mix-blend-lighten group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
               {/* Scanline */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
                 <div className="absolute w-full h-[2px] bg-[#ff7a00]/30" style={{ animation: "scanline 4s linear infinite" }} />

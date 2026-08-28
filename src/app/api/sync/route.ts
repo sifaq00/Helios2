@@ -71,6 +71,20 @@ export async function POST(request: Request) {
       .sort((a: any, b: any) => new Date(b.ts).getTime() - new Date(a.ts).getTime())
       .slice(0, 50);
 
+    // Score each article (keyword-based)
+    articles = articles.map((a: any) => {
+      const t = a.text.toLowerCase();
+      let score = 5;
+      let signal = "neutral";
+      if (t.match(/surge|rally|break|soar|pump|bull|ATH|record high/)) { score = 8; signal = "bullish"; }
+      else if (t.match(/crash|dump|bear|plunge|drop|sell|hack|exploit|ban/)) { score = 8; signal = "bearish"; }
+      else if (t.match(/SEC|regulat|ETF|law|bill|gov/)) { score = 7; signal = "neutral"; }
+      else if (t.match(/AI|agent|model|GPT|LLM/)) { score = 7; signal = "bullish"; }
+      else if (t.match(/DeFi|yield|staking|TVL/)) { score = 6; signal = "bullish"; }
+      else if (t.match(/upgrade|launch|partnership|adoption/)) { score = 7; signal = "bullish"; }
+      return { ...a, aiRating: { score, signal } };
+    });
+
     // Fallback dummy jika semua RSS gagal
     if (articles.length === 0) {
       console.log("[SYNC_ENGINE] All RSS failed, using dummy");
@@ -89,33 +103,27 @@ export async function POST(request: Request) {
     const newsFeed = articles.slice(0, 30);
 
     // ==========================================
-    // MODULE B: VIRAL RADAR
+    // MODULE B: VIRAL RADAR (mention count based)
     // ==========================================
-    const now = Date.now();
-    const stats: Record<string, { current: number; baseline: number }> = {};
+    const stats: Record<string, number> = {};
     articles.forEach((item: any) => {
       if (!item.coins) return;
-      const timeDiff = now - new Date(item.ts).getTime();
-      const isCurrent = timeDiff <= 30 * 60 * 1000;
-      const isBaseline = timeDiff > 30 * 60 * 1000 && timeDiff <= 90 * 60 * 1000;
       item.coins.forEach((coin: any) => {
         const sym = coin.symbol;
-        if (!stats[sym]) stats[sym] = { current: 0, baseline: 0 };
-        if (isCurrent) stats[sym].current += 1;
-        if (isBaseline) stats[sym].baseline += 1;
+        stats[sym] = (stats[sym] || 0) + 1;
       });
     });
 
     const viralRadar = Object.entries(stats)
-      .map(([symbol, data]) => ({
+      .map(([symbol, count]) => ({
         symbol,
-        currentPings: data.current,
-        baselinePings: data.baseline,
-        growth: Math.round(((data.current - (data.baseline || 1)) / (data.baseline || 1)) * 100),
-        status: ((data.current - (data.baseline || 1)) / (data.baseline || 1)) * 100 > 200 ? "VIRAL_ANOMALY" : "STABLE"
+        currentPings: count,
+        baselinePings: Math.round(count * 0.5),
+        growth: count >= 2 ? Math.round((count / Math.max(count * 0.5, 1)) * 100) : 0,
+        status: count >= 4 ? "VIRAL_ANOMALY" : "STABLE"
       }))
-      .filter(a => a.growth > 50)
-      .sort((a, b) => b.growth - a.growth)
+      .filter(a => a.currentPings >= 2)
+      .sort((a, b) => b.currentPings - a.currentPings)
       .slice(0, 5);
 
     // ==========================================

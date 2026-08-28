@@ -26,8 +26,8 @@ function createPgMock() {
             const pool = getPool();
             if (!pool) return { data: null, error: { message: 'DB_OFFLINE' } };
             try {
-              const res = await pool.query(`SELECT payload FROM ${table} WHERE id = $1`, [val]);
-              if (res.rows[0]) return { data: { payload: res.rows[0].payload }, error: null };
+              const res = await pool.query(`SELECT payload, updated_at FROM ${table} WHERE id = $1`, [val]);
+              if (res.rows[0]) return { data: { payload: res.rows[0].payload, updated_at: res.rows[0].updated_at }, error: null };
               return { data: null, error: { message: 'not found' } };
             } catch (e: any) {
               return { data: null, error: { message: e.message } };

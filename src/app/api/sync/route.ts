@@ -423,13 +423,14 @@ async function handleSync(request: Request) {
       dailyBrief = `TOP_NEWS: ${articles[0]?.title || "Crypto market active"}\nTOP_NARRATIVE: ${articles.filter((a) => a.aiRating?.signal !== "neutral").length > 5 ? "Momentum bullish dengan volume meningkat" : "Market konsolidasi, tunggu katalis regulasi"}\nMOST_MENTIONED: ${topCoin} leading mentions (${articles.filter((a) => a.coins.some((c: any) => c.symbol === topCoin)).length} intercepts)\nMARKET_VIBE: ${articles.filter((a) => a.aiRating?.signal === "bullish").length > articles.filter((a) => a.aiRating?.signal === "bearish").length ? "Optimis - akumulasi institusi" : "Cautious - wait for breakout"}`;
     }
 
-    // MODULE E: UPSERT TO SUPABASE - atomic batch
-    console.log("[SYNC_ENGINE] Uploading to Supabase DB...", { news: newsFeed.length, viral: viralRadar.length, signals: alphaSignals.length });
+    // MODULE E: UPSERT TO SUPABASE - atomic batch with updated_at
+    const nowIso = new Date().toISOString();
+    console.log("[SYNC_ENGINE] Uploading to Supabase DB...", { news: newsFeed.length, viral: viralRadar.length, signals: alphaSignals.length, at: nowIso });
     const { error: dbError } = await supabase.from("terminal_cache").upsert([
-      { id: "news_feed", payload: newsFeed },
-      { id: "viral_radar", payload: viralRadar },
-      { id: "alpha_signals", payload: alphaSignals },
-      { id: "daily_brief", payload: { brief: dailyBrief } },
+      { id: "news_feed", payload: newsFeed, updated_at: nowIso },
+      { id: "viral_radar", payload: viralRadar, updated_at: nowIso },
+      { id: "alpha_signals", payload: alphaSignals, updated_at: nowIso },
+      { id: "daily_brief", payload: { brief: dailyBrief }, updated_at: nowIso },
     ]);
 
     if (dbError) throw new Error(`Supabase Error: ${dbError.message}`);

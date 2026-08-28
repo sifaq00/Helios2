@@ -302,15 +302,6 @@
 			</div>
 		</section>
 
-		<!-- CTA TERMINAL -->
-		<section class="v2-cta-section" style="padding:80px 70px; text-align:center; border-top:1px solid #1a1a1a;">
-			<div class="v2-cta-wrap">
-				<p class="v2-cta-sub" style="color:#666; font-size:11px; letter-spacing:0.4em; margin-bottom:20px;">// ACCESS GRANTED</p>
-				<a href="/terminal" class="v2-cta"><span>LAUNCH TERMINAL</span><span>→</span></a>
-				<p class="v2-cta-meta" style="color:#444; font-size:10px; margin-top:16px; letter-spacing:0.2em;">190+ COUNTRIES • 99.97% UPTIME • 24MS LATENCY</p>
-			</div>
-		</section>
-
 		<!-- div .footer -->
 		<footer class="footer" style="align-items: flex-end; padding-bottom: 0;">
 			<div style="display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%;">
@@ -333,18 +324,10 @@
 	<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 	<script src="/v2/js/js.js"></script>
 	<script>
-		// CTA center sync: start lebih awal biar pas section di tengah sudah center
-		gsap.from('.v2-cta-sub',{
-			xPercent: -40, opacity: 0,
-			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
-		});
-		gsap.from('.v2-cta',{
-			scale: 0.85, rotation: -2,
-			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
-		});
-		gsap.from('.v2-cta-meta',{
-			xPercent: 40, opacity: 0,
-			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
+		// Live preview parallax
+		gsap.from('.v2-preview',{
+			opacity: 0, y: 30,
+			scrollTrigger:{trigger:'.v2-preview',start:'top 85%',end:'top 50%',scrub:1}
 		});
 	</script>
 </body>

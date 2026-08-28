@@ -157,9 +157,9 @@ export default function TerminalDashboard() {
   const topMentions = getTopMentions();
   const trendingNarratives = getTrendingNarratives();
 
-  const highImpactNews = newsFeed.filter(n => (n.aiRating?.score || 0) >= 70);
+  const highImpactNews = newsFeed.filter(n => (n.aiRating?.score || 0) >= 7);
   const topNews = highImpactNews.length > 0 ? highImpactNews[0] : null;
-  const actionSignals = newsFeed.filter(n => n.aiRating?.signal === "long" || n.aiRating?.signal === "short").slice(0, 3);
+  const actionSignals = newsFeed.filter(n => n.aiRating?.signal === "long" || n.aiRating?.signal === "short" || n.aiRating?.signal === "bullish" || n.aiRating?.signal === "bearish").slice(0, 3);
 
   return (
     <main className="scanlines min-h-screen bg-black text-white font-mono selection:bg-[#ff7a00] selection:text-black">
@@ -270,7 +270,7 @@ export default function TerminalDashboard() {
             <div className="flex flex-col gap-4 p-4">
               {actionSignals.length > 0 ? (
                 actionSignals.map((signalItem) => (
-                  <div key={signalItem.id} className={`border-l-2 ${signalItem.aiRating?.signal === 'long' ? 'border-green-500' : 'border-[#ff7a00]'} pl-3`}>
+                  <div key={signalItem.id} className={`border-l-2 ${signalItem.aiRating?.signal === 'long' || signalItem.aiRating?.signal === 'bullish' ? 'border-green-500' : 'border-red-500'} pl-3`}>
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-bold text-white uppercase text-sm">
                         {signalItem.coins && signalItem.coins.length > 0 ? signalItem.coins[0].symbol : "GLOBAL"}

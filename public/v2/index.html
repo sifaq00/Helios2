@@ -354,7 +354,15 @@
 			// counter increment loop
 			let more=47;
 			if(counter) setInterval(()=>{ more = 47 + Math.floor(Math.random()*4); counter.textContent='+ '+more+' MORE INTERCEPTS \u2022 SCROLL TO LOAD MORE \u2192'; counter.style.animation='v2pulse 0.3s'; setTimeout(()=>counter.style.animation='',300); }, 1800);
-			// highlight cycle synced with scan
+			// highlight cycle synced with scan + font bright
+			function setActiveFonts(el, active){
+				const spans=el.querySelectorAll('span');
+				// spans[1] is headline, spans[2] is desc
+				if(spans[1]){ spans[1].style.color=active?'#fff':'#ddd'; spans[1].style.fontWeight=active?'700':'400'; }
+				if(spans[2]) spans[2].style.color=active?'#999':'#666';
+				if(spans[0]) spans[0].style.color=active?'#ff7a00':'#666';
+			}
+			items.forEach((el,i)=> setActiveFonts(el, i===0));
 			moveScanTo(0);
 			setInterval(()=>{
 				idx=(idx+1)%items.length;
@@ -364,6 +372,7 @@
 					el.style.opacity=active?'1':'0.45';
 					el.style.background=active?'rgba(255,122,0,0.06)':'transparent';
 					el.style.transform=active?'translateX(4px)':'translateX(0)';
+					setActiveFonts(el, active);
 				});
 				moveScanTo(idx);
 			}, 1800);

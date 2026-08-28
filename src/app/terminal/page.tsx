@@ -564,12 +564,12 @@ export default function TerminalDashboard() {
                         <div className="grid grid-cols-2 gap-8">
                           <div className="group/node border border-[#ff7a0040] p-4 text-center bg-black/50 hover:bg-[#110000] transition-colors relative">
                             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#ff7a00]"></div>
-                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">OPENROUTER</div>
-                            <div className="text-[8px] text-gray-500 font-mono uppercase">MISTRAL_SMALL_CORE</div>
+                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">MIMO</div>
+                            <div className="text-[8px] text-gray-500 font-mono uppercase">MIMO_V2.5_CORE</div>
                           </div>
                           <div className="group/node border border-[#ff7a0040] p-4 text-center bg-black/50 hover:bg-[#110000] transition-colors relative">
                             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#ff7a00]"></div>
-                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">OPENNEWS</div>
+                            <div className="text-[11px] text-white font-black mb-1 tracking-widest">6551</div>
                             <div className="text-[8px] text-gray-500 font-mono uppercase">REALTIME_INGESTION</div>
                           </div>
                         </div>

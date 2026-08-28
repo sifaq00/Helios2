@@ -145,6 +145,8 @@ export default function AssetDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [aiInsight, setAiInsight] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [neuralProgress, setNeuralProgress] = useState(0);
+  const [neuralStage, setNeuralStage] = useState(0);
 
   // Fetch data khusus untuk koin ini - handle both array and envelope
   useEffect(() => {
@@ -177,11 +179,31 @@ export default function AssetDetail() {
 
   // Simulasi Pemanggilan LLM (OpenRouter)
   // Di produksi nyata, ini akan menembak ke endpoint /api/ai/summary milik Anda
+  // Neural loader animation - cycles stages while generating
+  useEffect(() => {
+    if (!isGenerating) {
+      setNeuralProgress(0);
+      setNeuralStage(0);
+      return;
+    }
+    const stages = 4;
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct += Math.random() * 7 + 2;
+      if (pct >= 99) pct = 99;
+      setNeuralProgress(Math.min(pct, 99));
+      setNeuralStage(Math.min(Math.floor((pct / 100) * stages), stages - 1));
+    }, 180);
+    return () => clearInterval(interval);
+  }, [isGenerating]);
+
   const generateAIInsight = async () => {
     if (safeNews.length === 0) return;
     
     setIsGenerating(true);
     setAiInsight("");
+    setNeuralProgress(5);
+    setNeuralStage(0);
     
     try {
       const response = await fetch("/api/ai", {
@@ -189,29 +211,34 @@ export default function AssetDetail() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           coin: coin,
-          newsData: safeNews.slice(0, 10), // Kirim 10 berita terbaru saja agar hemat token
+          newsData: safeNews.slice(0, 10),
         }),
       });
 
       const data = await response.json();
-      if (data.error) throw new Error(data.error);
+      if (!response.ok && data.error) throw new Error(data.details || data.error);
+      if (!data.result) throw new Error("Empty AI response");
 
-      // Jalankan efek pengetikan untuk hasil dari AI asli
+      const fullText = (data.fallback ? `// FALLBACK SYNTHESIS (${data.warning || "LLM offline"})\n\n` : "") + data.result;
+      setNeuralProgress(100);
+      setNeuralStage(3);
       let currentIndex = 0;
-      const fullText = data.result;
       const typingInterval = setInterval(() => {
         if (currentIndex <= fullText.length) {
           setAiInsight(fullText.slice(0, currentIndex));
-          currentIndex += 3; // Menambah 3 karakter per tick agar animasi terasa jauh lebih cepat
+          currentIndex += 3;
         } else {
           clearInterval(typingInterval);
           setIsGenerating(false);
         }
-      }, 10); // Interval dipercepat ke 10ms (sebelumnya 15ms)
+      }, 10);
 
-    } catch (error) {
-      setAiInsight("[ERROR: AI_LINK_FAILURE] - Connection to Neural Network lost.");
+    } catch (error: any) {
+      console.error("[AI] failed:", error);
+      const msg = error?.message || "Unknown";
+      setAiInsight(`[ERROR: AI_LINK_FAILURE]\n${msg}\n\n// Fallback local synthesis:\n${safeNews.filter(n=>n.aiRating?.signal!=="neutral").slice(0,3).map(n=>`- ${n.text.slice(0,100)} [${n.aiRating?.signal}]`).join("\n") || "- No strong directional signals"}`);
       setIsGenerating(false);
+      setNeuralProgress(0);
     }
   };
 
@@ -290,15 +317,106 @@ export default function AssetDetail() {
                 ) : (
                   <>
                     <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar mb-4">
-                      <div className="space-y-1">
-                        {parseAIResponse(aiInsight)}
-                        {isGenerating && (
-                          <div className="flex items-center gap-1 mt-4">
-                            <span className="text-[#ff7a00] font-bold animate-pulse">_</span>
-                            <span className="text-[#ff7a00] text-xs">PROCESSING NEURAL DATA...</span>
+                      {isGenerating && !aiInsight ? (
+                        /* ===== FANCY NEURAL LOADER ===== */
+                        <div className="h-full flex flex-col items-center justify-center py-6 space-y-5">
+                          {/* Pulsing core */}
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-[#ff7a00]/20 rounded-full blur-xl animate-pulse" />
+                            <div className="relative w-16 h-16 border-2 border-[#ff7a00] bg-black flex items-center justify-center">
+                              <Cpu className="w-7 h-7 text-[#ff7a00] animate-pulse" />
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#ff7a00] rounded-full animate-ping" />
+                              <div className="absolute -bottom-1 -left-1 w-2 h-2 border border-[#ff7a00] bg-black" />
+                            </div>
+                            <div className="absolute -inset-2 border border-[#ff7a00]/20 rounded-full animate-[spin_3s_linear_infinite]" />
                           </div>
-                        )}
-                      </div>
+
+                          <div className="text-center">
+                            <div className="flex items-center justify-center gap-2 text-[#ff7a00] text-[11px] tracking-[0.3em] font-black">
+                              <span className="w-2 h-2 bg-[#ff7a00] rounded-full animate-pulse" />
+                              NEURAL ENGINE ACTIVE
+                              <span className="w-2 h-2 bg-[#ff7a00] rounded-full animate-pulse" />
+                            </div>
+                            <div className="text-[10px] text-gray-500 tracking-widest mt-1">MIMO-V2.5 • {safeNews.length} FEEDS • {coin}</div>
+                          </div>
+
+                          {/* Stages */}
+                          <div className="w-full max-w-[280px] space-y-2">
+                            {[
+                              { label: "INGESTING FEED", sub: `${safeNews.length} vectors` },
+                              { label: "ANALYZING SENTIMENT", sub: "matrix scan" },
+                              { label: "MAPPING DRIVERS", sub: "3 keys" },
+                              { label: "SYNTHESIZING ALPHA", sub: "signal gen" },
+                            ].map((s, i) => {
+                              const done = i < neuralStage;
+                              const active = i === neuralStage;
+                              return (
+                                <div key={i} className={`flex items-center gap-3 px-3 py-2 border text-[10px] tracking-widest transition-all ${active ? "border-[#ff7a00] bg-[#ff7a00]/10 text-[#ff7a00]" : done ? "border-green-900 bg-[#0a1a0a] text-green-500" : "border-[#222] bg-[#0a0a0a] text-gray-600"}`}>
+                                  <div className={`w-4 h-4 flex items-center justify-center border text-[9px] font-black ${active ? "border-[#ff7a00] bg-[#ff7a00] text-black animate-pulse" : done ? "border-green-700 bg-green-900 text-white" : "border-[#333] bg-black"}`}>
+                                    {done ? "✓" : active ? "●" : "○"}
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="font-bold">{s.label}</div>
+                                    <div className="text-[8px] opacity-60">{s.sub}</div>
+                                  </div>
+                                  {active && <Activity className="w-3 h-3 animate-spin" />}
+                                  {done && <span className="text-[8px]">DONE</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="w-full max-w-[280px] space-y-1.5">
+                            <div className="flex justify-between text-[9px] tracking-widest">
+                              <span className="text-gray-500">PROGRESS</span>
+                              <span className="text-[#ff7a00] font-bold">{Math.round(neuralProgress)}%</span>
+                            </div>
+                            <div className="h-1.5 bg-[#111] border border-[#222] overflow-hidden relative">
+                              <div className="h-full bg-gradient-to-r from-[#ff7a00] to-[#ff9500] transition-all duration-300 relative overflow-hidden" style={{ width: `${neuralProgress}%` }}>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-[8px] text-gray-600 font-mono">
+                              <span>0x{Math.floor(neuralProgress * 42).toString(16).toUpperCase().padStart(4, "0")}</span>
+                              <span className="text-[#ff7a00] animate-pulse">NEURAL_LINK: STABLE</span>
+                              <span>{(neuralProgress * 0.12).toFixed(2)}s</span>
+                            </div>
+                          </div>
+
+                          {/* Matrix flicker */}
+                          <div className="flex gap-1 text-[8px] font-mono text-[#ff7a00]/40">
+                            {Array.from({ length: 12 }).map((_, i) => (
+                              <span key={i} className="animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}>{Math.random() > 0.5 ? "1" : "0"}</span>
+                            ))}
+                            <span className="text-gray-600">• DECRYPTING •</span>
+                            {Array.from({ length: 12 }).map((_, i) => (
+                              <span key={i + 12} className="animate-pulse" style={{ animationDelay: `${(i+12) *0.08}s` }}>{Math.random() > 0.5 ? "1" : "0"}</span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          {parseAIResponse(aiInsight)}
+                          {isGenerating && (
+                            <div className="mt-4 border border-[#ff7a00]/30 bg-[#110000] p-3 flex items-center gap-3">
+                              <div className="w-6 h-6 border border-[#ff7a00] flex items-center justify-center shrink-0">
+                                <div className="w-2 h-2 bg-[#ff7a00] rounded-full animate-ping" />
+                              </div>
+                              <div className="flex-1">
+                                <div className="h-1 bg-[#222] overflow-hidden">
+                                  <div className="h-full bg-[#ff7a00] animate-pulse" style={{ width: "60%" }} />
+                                </div>
+                                <div className="text-[9px] text-[#ff7a00] tracking-widest mt-1 flex justify-between">
+                                  <span>STREAMING TOKENS...</span>
+                                  <span className="animate-pulse">{aiInsight.length} chars</span>
+                                </div>
+                              </div>
+                              <Zap className="w-4 h-4 text-[#ff7a00] animate-pulse" />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {aiInsight && !isGenerating && (
                       <div className="border-t border-[#ff7a0040] pt-4 mt-auto flex justify-end">

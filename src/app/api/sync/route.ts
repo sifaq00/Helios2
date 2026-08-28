@@ -204,10 +204,27 @@ function scoreArticle(text: string): { score: number; signal: "bullish" | "beari
   return { score: 5, signal: "neutral" };
 }
 
-export async function POST(request: Request) {
+async function extractSecret(request: Request): Promise<string | null> {
+  // Check header first (for GitHub Actions / UptimeRobot)
+  const headerSecret = request.headers.get("x-sync-secret") || request.headers.get("authorization")?.replace("Bearer ", "");
+  if (headerSecret) return headerSecret;
+  // Check query param (for GET cron)
   try {
-    const body = await request.json().catch(() => ({}));
-    const { secret } = body;
+    const url = new URL(request.url);
+    const querySecret = url.searchParams.get("secret");
+    if (querySecret) return querySecret;
+  } catch {}
+  // Check body (for POST)
+  try {
+    const body = await request.clone().json().catch(() => ({}));
+    if (body.secret) return body.secret;
+  } catch {}
+  return null;
+}
+
+async function handleSync(request: Request) {
+  try {
+    const secret = await extractSecret(request);
     if (secret !== SYNC_SECRET) {
       return NextResponse.json({ error: "UNAUTHORIZED_UPLINK" }, { status: 401 });
     }
@@ -426,4 +443,12 @@ export async function POST(request: Request) {
     console.error("[SYNC_ENGINE] CRITICAL FAILURE:", error.message, error.stack?.slice(0, 500));
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+export async function POST(request: Request) {
+  return handleSync(request);
+}
+
+export async function GET(request: Request) {
+  return handleSync(request);
 }

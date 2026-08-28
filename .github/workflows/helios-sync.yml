@@ -1,0 +1,75 @@
+name: Helios Realtime Sync
+
+on:
+  schedule:
+    # Every 5 minutes - GitHub Actions free (2000 min/month = ~8640 runs/month ~ 2 min total)
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force sync even if recently synced'
+        required: false
+        default: 'false'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Trigger Helios Sync (POST)
+        env:
+          HELIOS_URL: ${{ secrets.HELIOS_URL || vars.HELIOS_URL }}
+          SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
+        run: |
+          # Default URL fallback - update HELIOS_URL secret if different
+          URL="${HELIOS_URL:-https://helios2.vercel.app}/api/sync"
+          SECRET="${SYNC_SECRET:-helios-admin-2026}"
+          
+          echo "Syncing $URL ..."
+          
+          # Try POST first (primary)
+          HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: Helios-GitHub-Cron/1.0" \
+            -d "{\"secret\":\"$SECRET\"}" \
+            --max-time 30 || echo "000")
+          
+          echo "HTTP $HTTP_CODE"
+          cat /tmp/resp.json | head -c 2000
+          echo ""
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✓ Sync success"
+            # Verify count
+            COUNT=$(cat /tmp/resp.json | grep -o '"articles":[0-9]*' | head -1)
+            echo "Result: $COUNT"
+            exit 0
+          fi
+          
+          # Fallback: try GET with query secret (for GET-compatible deployments)
+          echo "POST failed, trying GET fallback..."
+          HTTP_CODE2=$(curl -s -o /tmp/resp2.json -w "%{http_code}" "$URL?secret=$SECRET" \
+            -H "User-Agent: Helios-GitHub-Cron/1.0" \
+            --max-time 30 || echo "000")
+          
+          echo "GET HTTP $HTTP_CODE2"
+          cat /tmp/resp2.json | head -c 2000
+          
+          if [ "$HTTP_CODE2" = "200" ]; then
+            echo "✓ Sync success via GET"
+            exit 0
+          fi
+          
+          echo "✗ Both POST and GET failed"
+          exit 1
+
+      - name: Verify DB freshness
+        if: success()
+        env:
+          HELIOS_URL: ${{ secrets.HELIOS_URL || vars.HELIOS_URL }}
+        run: |
+          URL="${HELIOS_URL:-https://helios2.vercel.app}/api/news?limit=1&meta=1"
+          echo "Checking $URL"
+          curl -s "$URL" | head -c 500
+          echo ""
+          echo "✓ Verification done"

@@ -1,0 +1,10 @@
+/* Olive 101 - Fonts101 CC BY-ND - https://www.fonts101.com */
+@font-face {
+  font-family: 'Olive 101';
+  src: url('/fonts/Olive101.woff2') format('woff2'),
+       url('/fonts/Olive101.woff') format('woff'),
+       url('/fonts/Olive101.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

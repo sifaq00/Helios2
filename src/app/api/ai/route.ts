@@ -6,10 +6,11 @@ const AI_TIMEOUT = 15000; // AI butuh waktu lebih lama (15 detik) untuk berpikir
 export async function POST(request: Request) {
   try {
     const { coin, newsData } = await request.json();
-    const openRouterKey = process.env.OPENROUTER_API_KEY;
+    const llmUrl = process.env.LLM_API_URL || "https://token-plan-sgp.xiaomimimo.com/v1/chat/completions";
+    const llmKey = process.env.LLM_API_KEY;
 
-    if (!openRouterKey) {
-      console.error("[MAIL_MAN_AI] Critical Error: OPENROUTER_API_KEY missing.");
+    if (!llmKey) {
+      console.error("[HELIOS_AI] Critical Error: LLM_API_KEY missing.");
       return NextResponse.json({ error: "API_KEY_NOT_FOUND" }, { status: 500 });
     }
 
@@ -18,24 +19,19 @@ export async function POST(request: Request) {
 
     let lastError: any;
 
-    // ==========================================
-    // FAIL-SAFE NEURAL LINK (RETRY LOGIC)
-    // ==========================================
     for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT);
 
       try {
-        const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const aiResponse = await fetch(llmUrl, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${openRouterKey}`,
+            "Authorization": `Bearer ${llmKey}`,
             "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "Mail Man Terminal",
           },
           body: JSON.stringify({
-            model: "mistralai/mistral-small-24b-instruct-2501",
+            model: "mimo-v2-flash",
             messages: [{ role: "user", content: prompt }],
           }),
           signal: controller.signal

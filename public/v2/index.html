@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>HELIOS // PARALLAX</title>
+	<link rel="icon" href="/logo.png" type="image/png">
+	<link rel="stylesheet" href="/fonts/Olive101.css">
+	<link rel="stylesheet" href="/v2/style/normalize.css">
+	<link rel="stylesheet" href="/v2/style/style.css">
+	<style>
+		* { font-family: 'Olive 101', monospace !important; }
+		.header__marq { background: #ff7a00 !important; }
+		.header__marq-txt { color: #000 !important; font-weight: 900; }
+		.title { color: #fff !important; letter-spacing: 0.05em; }
+		.title .stroke { -webkit-text-stroke: 1px #ff7a00 !important; color: transparent !important; }
+		.section-title { color: #fff !important; }
+		.section-title .stroke { -webkit-text-stroke: 1px #ff7a00 !important; }
+		.benefits__num { -webkit-text-stroke: 1px #ff7a00 !important; }
+		.work__item-num { color: #ff7a00 !important; mix-blend-mode: normal !important; }
+		.work__item-img { position: relative; }
+		.work__item-img::after { content:""; position:absolute; inset:0; background: rgba(0,0,0,0.35); pointer-events:none; }
+		.work__item-img img { filter: brightness(0.68) contrast(1.08) saturate(0.85); }
+		.serv__item-txt { color: #ff7a00 !important; }
+		.footer__div { color: #ff7a00 !important; letter-spacing: 10px; }
+		.v2-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 16px 70px; pointer-events: none; }
+		.v2-nav a { pointer-events: auto; }
+		.v2-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+		.v2-logo img { width: 48px; height: 48px; border: 1px solid #ff7a00; object-fit: cover; }
+		.v2-logo span { color: #ff7a00; letter-spacing: 0.35em; font-size: 20px; font-weight: 800; }
+		.v2-nav-btn { position: relative; display: inline-flex; align-items: center; border: 2px solid #ff7a00; color: #ff7a00; padding: 10px 20px; font-size: 11px; letter-spacing: 0.2em; text-decoration: none; overflow: hidden; transition: color 0.3s, box-shadow 0.3s; }
+		.v2-nav-btn::before { content: ""; position: absolute; inset: 0; background: #ff7a00; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.9,0,0.1,1); z-index: 0; }
+		.v2-nav-btn:hover::before { transform: translateY(0); }
+		.v2-nav-btn:hover { color: #000 !important; box-shadow: 0 0 20px rgba(255,122,0,0.35); }
+		@media (max-width: 768px) { .v2-nav { padding: 12px 20px; } }
+		/* CTA parallax like work/benefits */
+		.v2-cta { position: relative; display: inline-flex; align-items: center; gap: 16px; border: 2px solid #ff7a00; color: #ff7a00; padding: 18px 48px; letter-spacing: 0.3em; font-size: 12px; font-weight: 800; text-decoration: none; overflow: hidden; transition: color 0.3s, box-shadow 0.3s; box-shadow: 0 0 20px rgba(255,122,0,0.15); will-change: transform; }
+		.v2-cta::before { content: ""; position: absolute; inset: 0; background: #ff7a00; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.9,0,0.1,1); z-index: 0; }
+		.v2-cta:hover::before { transform: translateY(0); }
+		.v2-cta:hover { color: #000 !important; box-shadow: 0 0 40px rgba(255,122,0,0.45); }
+		.v2-cta span { position: relative; z-index: 1; display: inline-block; }
+	</style>
+</head>
+
+<body>
+	<nav class="v2-nav">
+		<a href="/" class="v2-logo"><img src="/logo.png" alt="HELIOS"><span>HELIOS</span></a>
+		<a href="/terminal" class="v2-nav-btn"><span style="position:relative; z-index:1;">LAUNCH TERMINAL →</span></a>
+	</nav>
+	<!-- div .wrapp -->
+	<div class="wrapp">
+
+		<!-- div .header -->
+		<header class="header">
+			<h1 class="title" data-splitting><span class="title_paralax">HELIOS</span><br><span class="stroke"> INTELLIGENCE MATRIX</span></h1>
+			<div class="header__img">
+				<img src="/logo.png" alt="HELIOS">
+			</div>
+			<div class="header__marq">
+				<div class="header__marq-wrapp">
+					<span class="header__marq-txt">INTELLIGENCE MATRIX • MAPPING MARKET UNCERTAINTY
+						<span class="header__marq-star">
+							<img src="/v2/img/star.svg" alt="">
+						</span>
+					</span>
+					<span class="header__marq-txt">INTELLIGENCE MATRIX • MAPPING MARKET UNCERTAINTY
+						<span class="header__marq-star">
+							<img src="/v2/img/star.svg" alt="">
+						</span>
+					</span>
+					<span class="header__marq-txt">INTELLIGENCE MATRIX • MAPPING MARKET UNCERTAINTY
+						<span class="header__marq-star">
+							<img src="/v2/img/star.svg" alt="">
+						</span>
+					</span>
+					<span class="header__marq-txt">INTELLIGENCE MATRIX • MAPPING MARKET UNCERTAINTY
+						<span class="header__marq-star">
+							<img src="/v2/img/star.svg" alt="">
+						</span>
+					</span>
+				</div>
+			</div>
+		</header>
+
+		<main class="main">
+
+			<!-- div .about -->
+			<section class="about">
+				<div class="about__wrapp">
+					<div class="about__img">
+						<img src="/v2/img/5.png" alt="5">
+					</div>
+					<div class="about__txt">
+						<h2 class="section-title">abo<span class="stroke">ut helios</span>
+							<span class="section-title__square"></span>
+						</h2>
+						<p class="about__p">HELIOS is an autonomous neural system built to quantify market uncertainty by mapping the structural dynamics of crypto-driven markets. The platform ingests millions of data points daily from underground sources, exchanges, and social networks, processing them through multi-layered AI analysis in real-time. Every signal is scored for impact, every narrative is tracked across 190+ countries, and every anomaly is detected before it reaches the mainstream. Zero noise, pure signal. Engineered for traders, analysts, and operators who demand precision at the edge of chaos.</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- div .stats -->
+			<section class="stats" style="padding: 100px 70px; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;">
+				<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px;">
+					<div class="stats-item" style="text-align: center; flex: 1; min-width: 200px;">
+						<div class="stats-num" data-speed="-200" data-target="190" data-suffix="+" style="font-size: 70px; color: #ff7a00; letter-spacing: 0.05em;">0+</div>
+						<div style="font-size: 10px; color: #555; letter-spacing: 0.3em; margin-top: 8px;">COUNTRIES TRACKED</div>
+					</div>
+					<div class="stats-item" style="text-align: center; flex: 1; min-width: 200px;">
+						<div class="stats-num" data-speed="-150" data-target="24" data-suffix="ms" style="font-size: 70px; color: #ff7a00; letter-spacing: 0.05em;">0ms</div>
+						<div style="font-size: 10px; color: #555; letter-spacing: 0.3em; margin-top: 8px;">AVG LATENCY</div>
+					</div>
+					<div class="stats-item" style="text-align: center; flex: 1; min-width: 200px;">
+						<div class="stats-num" data-speed="-100" data-target="99.97" data-suffix="%" style="font-size: 70px; color: #ff7a00; letter-spacing: 0.05em;">0%</div>
+						<div style="font-size: 10px; color: #555; letter-spacing: 0.3em; margin-top: 8px;">UPTIME</div>
+					</div>
+					<div class="stats-item" style="text-align: center; flex: 1; min-width: 200px;">
+						<div class="stats-num" data-speed="-50" data-target="2" data-suffix="M+" style="font-size: 70px; color: #ff7a00; letter-spacing: 0.05em;">0M+</div>
+						<div style="font-size: 10px; color: #555; letter-spacing: 0.3em; margin-top: 8px;">DAILY DATA POINTS</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- div .benefits -->
+			<section class="benefits">
+				<div class="content">
+					<h2 class="section-title">core <span class="stroke">modules</span>
+						<span class="section-title__square"></span>
+					</h2>
+
+					<ul class="benefits__list">
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-200">/01</span>
+							<p class="benefits__p"><b style="color:#fff">NEURAL FEED</b> — Real-time news ingestion from 6551 API with Supabase cache. Scored and filtered for relevance.</p>
+						</li>
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-150">/02</span>
+							<p class="benefits__p"><b style="color:#fff">AI ANALYSIS</b> — Mimo-v2.5 powered synthesis. Contextual bullish/bearish signals with impact scoring in 100ms.</p>
+						</li>
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-150">/03</span>
+							<p class="benefits__p"><b style="color:#fff">VIRAL RADAR</b> — Anomaly detection on viral momentum. Growth rate 30min vs 90min baseline, 50%+ threshold.</p>
+						</li>
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-150">/04</span>
+							<p class="benefits__p"><b style="color:#fff">DAILY BRIEF</b> — AI-generated 4-line summary: top news, narrative, most mentioned, and market vibe.</p>
+						</li>
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-110">/05</span>
+							<p class="benefits__p"><b style="color:#fff">ALPHA SIGNALS</b> — Autonomous signal generation with [SYMBOL | SIGNAL] format. OpenRouter + Mimo dual engine.</p>
+						</li>
+						<li class="benefits__item">
+							<span class="benefits__num" data-speed="-200">/06</span>
+							<p class="benefits__p"><b style="color:#fff">TERMINAL</b> — 3-column command center: System Report, Raw Data Stream, and Narrative Intercepts. Live.</p>
+						</li>
+					</ul>
+				</div>
+			</section>
+
+			<!-- div .work -->
+			<section class="work">
+				<div class="content">
+					<h2 class="section-title">tech <span class="stroke">stack</span>
+						<span class="section-title__square"></span>
+					</h2>
+				</div>
+
+				<div class="work__wrapp">
+					<div class="work__item" data-speed="-300">
+						<span class="work__item-num" data-speed="-1000">/001</span>
+						<div class="work__item-img">
+							<img src="/v2/img/1.png" alt="1">
+						</div>
+					</div>
+					<div class="work__item" data-speed="-600">
+						<span class="work__item-num" data-speed="-500">/002</span>
+						<div class="work__item-img">
+							<img src="/v2/img/2.png" alt="2">
+						</div>
+					</div>
+					<div class="work__item" data-speed="-700">
+						<span class="work__item-num" data-speed="-700">/003</span>
+						<div class="work__item-img">
+							<img src="/v2/img/3.png" alt="3">
+						</div>
+					</div>
+					<div class="work__item" data-speed="-400">
+						<span class="work__item-num" data-speed="-200">/004</span>
+						<div class="work__item-img">
+							<img src="/v2/img/4.png" alt="4">
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- div .serv -->
+			<section class="serv">
+				<div class="content">
+					<h2 class="section-title">system <span class="stroke">core</span>
+						<span class="section-title__square"></span>
+					</h2>
+
+					<div class="serv__list">
+						<div class="serv__item">
+							<span class="serv__item-arrow" data-speed="500">
+								<img src="/v2/img/arrow.svg" alt="">
+							</span>
+							<div class="serv__item-txt">
+								<span class="serv__item-text">/KERNEL v2.0.0-HELIOS</span>
+							</div>
+						</div>
+						<div class="serv__item">
+							<span class="serv__item-arrow" data-speed="400">
+								<img src="/v2/img/arrow.svg" alt="">
+							</span>
+							<div class="serv__item-txt">
+								<span class="serv__item-text">/NEURAL MIMO-V2.5</span>
+							</div>
+						</div>
+						<div class="serv__item">
+							<span class="serv__item-arrow" data-speed="800">
+								<img src="/v2/img/arrow.svg" alt="">
+							</span>
+							<div class="serv__item-txt">
+								<span class="serv__item-text">/LATENCY 24MS NOMINAL</span>
+							</div>
+						</div>
+						<a href="/terminal" style="text-decoration:none; display:block;">
+						<div class="serv__item">
+							<span class="serv__item-arrow" data-speed="600">
+								<img src="/v2/img/arrow.svg" alt="">
+							</span>
+							<div class="serv__item-txt">
+								<span class="serv__item-text">/LAUNCH TERMINAL →</span>
+							</div>
+						</div>
+						</a>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- CTA TERMINAL -->
+		<section class="v2-cta-section" style="padding:80px 70px; text-align:center; background:#000; border-top:1px solid #1a1a1a;">
+			<div class="v2-cta-wrap">
+				<p class="v2-cta-sub" style="color:#666; font-size:11px; letter-spacing:0.4em; margin-bottom:20px;">// ACCESS GRANTED</p>
+				<a href="/terminal" class="v2-cta"><span>LAUNCH TERMINAL</span><span>→</span></a>
+				<p class="v2-cta-meta" style="color:#444; font-size:10px; margin-top:16px; letter-spacing:0.2em;">190+ COUNTRIES • 99.97% UPTIME • 24MS LATENCY</p>
+			</div>
+		</section>
+
+		<!-- div .footer -->
+		<footer class="footer" style="align-items: flex-end; padding-bottom: 0;">
+			<div style="display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%;">
+				<div class="footer__div" style="margin-bottom: 0;">
+					<span data-speed="-300">h</span>
+					<span data-speed="100">e</span>
+					<span data-speed="300">l</span>
+					<span data-speed="-300">i</span>
+					<span data-speed="350">o</span>
+					<span data-speed="200">s</span>
+				</div>
+				<img src="/logo.png" alt="HELIOS" style="width: 500px; height: auto; object-fit: contain; filter: drop-shadow(0 0 50px rgba(255,122,0,0.3)); margin-bottom: -20px;">
+			</div>
+		</footer>
+	</div>
+	<!-- /div .wrapp END -->
+	<script src="/v2/js/splitting.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+	<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+	<script src="/v2/js/js.js"></script>
+	<script>
+		// CTA center sync: start lebih awal biar pas section di tengah sudah center
+		gsap.from('.v2-cta-sub',{
+			xPercent: -40, opacity: 0,
+			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
+		});
+		gsap.from('.v2-cta',{
+			scale: 0.85, rotation: -2,
+			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
+		});
+		gsap.from('.v2-cta-meta',{
+			xPercent: 40, opacity: 0,
+			scrollTrigger:{trigger:'.v2-cta-section',start:'top 90%',end:'top 45%',scrub:1.9}
+		});
+	</script>
+</body>
+
+</html>

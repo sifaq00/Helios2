@@ -10,7 +10,7 @@ const InteractiveBackground = () => {
 
   useEffect(() => {
     // Generate 40 partikel acak dengan warna retro: putih, abu-abu, dan merah tema
-    const colors = ['#ffffff', '#888888', '#aaaaaa', '#ff0000'];
+    const colors = ['#ffffff', '#888888', '#aaaaaa', '#ff7a00'];
     const generatedParticles = Array.from({ length: 40 }).map((_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
@@ -71,7 +71,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 > BYPASSING FIREWALL...
 > ACCESS GRANTED.
 > 
-> WELCOME TO MAIL MAN TERMINAL.`;
+> WELCOME TO HELIOS TERMINAL.`;
 
   useEffect(() => {
     let currentIndex = 0;
@@ -110,14 +110,14 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       <div className="absolute inset-0 flex items-center justify-center p-6">
         <div className="relative max-w-2xl w-full">
           {/* Card Container dengan efek cyberpunk */}
-          <div className="bg-black/90 border border-[#ff0000] shadow-[0_0_50px_rgba(255,0,0,0.3)] backdrop-blur-sm">
+          <div className="bg-black/90 border border-[#ff7a00] shadow-[0_0_50px_rgba(255,0,0,0.3)] backdrop-blur-sm">
             {/* Header Terminal */}
-            <div className="border-b border-[#ff0000] px-4 py-2 flex items-center justify-between bg-[#ff0000]/10">
+            <div className="border-b border-[#ff7a00] px-4 py-2 flex items-center justify-between bg-[#ff7a00]/10">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-xs text-[#ff0000] font-mono ml-2">MAIL_MAN_TERMINAL.exe</span>
+                <span className="text-xs text-[#ff7a00] font-mono ml-2">MAIL_MAN_TERMINAL.exe</span>
               </div>
               <div className="text-xs text-gray-500 font-mono">SECURE CONNECTION</div>
             </div>

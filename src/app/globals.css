@@ -1,9 +1,10 @@
 @import "tailwindcss";
+@import "../../public/fonts/Olive101.css";
 
 :root {
   --background: #000000;
   --foreground: #ffffff;
-  --primary-red: #ff0000;
+  --primary-orange: #ff7a00;
 }
 
 /* Memastikan mode gelap selalu aktif jika terdeteksi oleh sistem */
@@ -17,8 +18,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  /* Menggunakan font monospace bawaan untuk kesan terminal */
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: 'Olive 101', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -89,7 +89,7 @@ body {
 
 .glitch-text::before {
   left: 2px;
-  text-shadow: -2px 0 var(--primary-red);
+  text-shadow: -2px 0 var(--primary-orange);
   clip: rect(24px, 550px, 90px, 0);
   animation: glitch-anim 3s infinite linear alternate-reverse;
 }
@@ -130,7 +130,7 @@ body {
    ========================================= */
 
 .bg-dither {
-  background-image: radial-gradient(rgba(255, 0, 0, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 122, 0, 0.15) 1px, transparent 1px);
   background-size: 4px 4px;
 }
 
@@ -145,7 +145,7 @@ body {
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #ff0000 #111;
+  scrollbar-color: #ff7a00 #111;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -158,10 +158,10 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ff0000;
+  background: #ff7a00;
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #cc0000;
+  background: #cc6600;
 }

@@ -1,126 +1,115 @@
-# MAIL MAN TERMINAL
+# HELIOS
 
-> **Advanced AI-Powered Crypto Intelligence & Market Signals**
+> **AI-Powered Crypto Intelligence & Market Signals**
 
-[![Status](https://img.shields.io/badge/Status-V1.0_LIVE-green?style=for-the-badge)]()
-[![Core](https://img.shields.io/badge/AI_Engine-ONLINE-red?style=for-the-badge)]()
-[![X](https://img.shields.io/badge/X-Follow%20Us-black?style=for-the-badge&logo=x)](https://x.com/mailmanonx)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/omnicima/mail-man)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-V2.0_LIVE-green?style=for-the-badge)]()
+[![Core](https://img.shields.io/badge/AI_Engine-MIMO--v2.5-blue?style=for-the-badge)]()
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/sifaq00/Helios-2)
 
-CA: [Contract Address Here]
+## Overview
 
-Twitter: [https://x.com/mailmanonx](https://x.com/mailmanonx)
+HELIOS is an autonomous AI system built for the intersection of cryptocurrency markets and predictive intelligence.
 
-## 📡 The Transmission
+It transforms global crypto news and market data into actionable signals through real-time news aggregation, anomaly detection, and advanced AI analysis powered by **Mimo-v2.5**.
 
-MAIL MAN is an autonomous AI system built for the intersection of cryptocurrency markets and predictive intelligence.
-
-It transforms global crypto news and market data into actionable signals through real-time news aggregation, anomaly detection, and advanced AI analysis.
-
-We don’t just track crypto.
-We quantify market uncertainty — modeling volatility, detecting regime shifts, and mapping the structural dynamics of crypto-driven markets through proprietary simulation engines and behavioral signal analysis.
+We don't just track crypto. We quantify market uncertainty — modeling volatility, detecting regime shifts, and mapping the structural dynamics of crypto-driven markets through behavioral signal analysis.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
-```mermaid
-graph TD
-    subgraph "USER_INTERFACE [MM_SYS]"
-        UI[Terminal Dashboard]
-        V_RADAR[Viral Radar]
-        A_SIG[Alpha Signals Panel]
-    end
+```
+USER_INTERFACE
+    ├── Terminal Dashboard (3-column: System Report, Raw Stream, Viral Radar)
+    ├── Landing Parallax (GSAP + Lenis smooth scroll)
+    └── Asset Detail (AI Synthesis per coin)
 
-    subgraph "API_ROUTING_LAYER [ENCRYPTED]"
-        N_EP["/api/news"]
-        A_EP["/api/ai"]
-        B_EP["/api/daily-brief"]
-        V_EP["/api/viral-radar"]
-    end
+API_LAYER
+    ├── /api/news          → Supabase cache (6551 news feed)
+    ├── /api/ai            → Mimo-v2.5 (asset synthesis)
+    ├── /api/viral-radar   → Growth anomaly detection
+    ├── /api/daily-brief   → AI market summary
+    ├── /api/alpha-signals → Signal generation
+    └── /api/sync          → Cron data ingestion
 
-    subgraph "NEURAL_CORE [INTELLIGENCE]"
-        OR[OpenRouter API / Mistral Small]
-        ON[OpenNews API / Data Source]
-    end
-
-    UI --> N_EP
-    UI --> A_EP
-    UI --> B_EP
-    UI --> V_EP
-
-    N_EP --> ON
-    A_EP --> OR
-    B_EP --> OR
-    V_EP --> ON
-
-    ON -- "Raw News Stream" --> N_EP
-    OR -- "Sentiment & Signals" --> A_EP
-    ON -- "Market Anomalies" --> V_EP
-    OR -- "Intelligence Brief" --> B_EP
-
-    style UI fill:#000,stroke:#f00,stroke-width:2px,color:#fff
-    style NEURAL_CORE fill:#111,stroke:#f00,stroke-dasharray: 5 5,color:#f00
-    style OR fill:#111,stroke:#f00,color:#fff
-    style ON fill:#111,stroke:#f00,color:#fff
+NEURAL_CORE
+    ├── Mimo-v2.5 (LLM) via xiaomimimo API
+    ├── OpenRouter (fallback LLM)
+    └── 6551 API (news data source)
 ```
 
-## 🛠️ Tech Stack
+---
 
-### Interface Layer
-* **Next.js 15 + TypeScript:** Modern, type-safe React framework for real-time dashboards.
-* **Tailwind CSS:** Utility-first styling for responsive design.
-* **Lucide React:** Minimalist iconography for market indicators.
-* **Custom CRT Effects:** Scanlines and flicker overlays for terminal immersion.
+## Tech Stack
 
-### Neural Core (AI Engine)
-* **Intelligence Layer:** Integrated with **OpenRouter (Mistral Small)** for advanced technical analysis and market sentiment.
-* **Data Ingestion:** Real-time news aggregation via **OpenNews API**.
-* **Quant Logic:** 
-  - **Dynamic Viral Radar:** Detects mentions spikes and growth multipliers.
-  - **Narrative Intercepts:** Identifies macro themes (AI, DePIN, L2) in the raw data stream.
-  - **Alpha Pulse:** Correlates AI ratings with technical signals.
+### Interface
+- **Next.js 16 + TypeScript** — App Router, React 19
+- **Tailwind CSS 4** — Utility-first styling
+- **GSAP 3.15 + Lenis** — Parallax & smooth scroll
+- **Lucide React** — Iconography
+- **Custom CRT Effects** — Scanlines, flicker, dithering
+
+### Neural Core
+- **Mimo-v2.5** — Primary LLM for AI synthesis, alpha signals, daily brief
+- **OpenRouter (LLaMA 3.1 8B)** — Fallback LLM engine
+- **6551 API** — Real-time news data source
+- **Supabase** — PostgreSQL cache for terminal data
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-- **RAW_DATA_STREAM:** Live decrypted news feed with real-time AI Impact Scoring.
-- **ALPHA SIGNALS:** Direct actionable pings (LONG/SHORT) with clickable source verified data.
-- **NEURAL BRIEF:** Daily system reports summarizing the global market matrix.
-- **LANGUAGE FILTER:** Multi-language support with "English Only" intercept toggle for cleaner analysis.
-- **VIRAL RADAR:** Real-time anomaly detection for assets gaining extreme social momentum.
+- **Terminal Dashboard:** 3-column command center — System Report, Raw Data Stream, Viral Radar
+- **Alpha Signals:** AI-generated [SYMBOL | SIGNAL] format signals
+- **Viral Radar:** Anomaly detection on viral momentum (30min vs 90min baseline, >50% threshold)
+- **Daily Brief:** 4-line AI summary — Top News, Narrative, Most Mentioned, Market Vibe
+- **AI Synthesis:** Per-coin analysis via Mimo-v2.5 with typing effect
+- **Parallax Landing:** GSAP ScrollTrigger + Lenis smooth scroll with clipPath hero animation
+- **Supabase Cache:** Offline-first DB with pg fallback when anon key missing
 
 ---
 
-## 🔧 Environment Setup
+## Environment Setup
 
 Create a `.env.local` file in the root directory:
 
 ```bash
-OPENNEWS_API_TOKEN=your_opennews_token
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+DATABASE_URL=postgresql://your_db_url
+
+# LLM (Mimo)
+LLM_API_URL=https://token-plan-sgp.xiaomimimo.com/v1/chat/completions
+LLM_API_KEY=your_mimo_api_key
+LLM_MODEL=mimo-v2.5
+
+# OpenRouter (fallback)
 OPENROUTER_API_KEY=your_openrouter_key
+
+# News API
+OPENNEWS_API_TOKEN=your_6551_token
 ```
 
-Install dependencies and start the terminal:
+Install dependencies and start:
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
+```
+
+To sync data:
+
+```bash
+curl -X POST http://localhost:3000/api/sync -H "Content-Type: application/json" -d '{"secret":"helios-admin-2026"}'
 ```
 
 ---
 
-## 🤝 Contributing
+## License
 
-We welcome contributions from both biological and artificial entities.
-Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 <div align="center">
-  <sub>MAIL MAN TERMINAL © 2026 • Synchronizing with the Global Crypto Markets</sub>
+  <sub>HELIOS &copy; 2026 &bull; Quantifying Market Uncertainty</sub>
 </div>

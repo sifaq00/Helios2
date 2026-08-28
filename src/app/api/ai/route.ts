@@ -45,11 +45,11 @@ export async function POST(request: Request) {
         }
 
         const errorText = await aiResponse.text();
-        console.warn(`[MAIL_MAN_AI] Attempt ${attempt} rejected:`, errorText);
+        console.warn(`[HELIOS_AI] Attempt ${attempt} rejected:`, errorText);
       } catch (error: any) {
         clearTimeout(timeoutId);
         lastError = error;
-        console.warn(`[MAIL_MAN_AI] Attempt ${attempt} connection drop: ${error.message}`);
+        console.warn(`[HELIOS_AI] Attempt ${attempt} connection drop: ${error.message}`);
       }
 
       // Jeda sebelum mencoba lagi jika gagal
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     throw lastError || new Error("NEURAL_LINK_EXHAUSTED");
 
   } catch (error: any) {
-    console.error("[MAIL_MAN_AI] Final Synthesis Failure:", error.message);
+    console.error("[HELIOS_AI] Final Synthesis Failure:", error.message);
     return NextResponse.json(
       { error: "AI_UPLINK_FAILED", details: "Neural link timeout. Check connection." }, 
       { status: 500 }

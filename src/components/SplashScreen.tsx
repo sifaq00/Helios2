@@ -117,7 +117,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-xs text-[#ff7a00] font-mono ml-2">MAIL_MAN_TERMINAL.exe</span>
+                <span className="text-xs text-[#ff7a00] font-mono ml-2">HELIOS_TERMINAL.exe</span>
               </div>
               <div className="text-xs text-gray-500 font-mono">SECURE CONNECTION</div>
             </div>

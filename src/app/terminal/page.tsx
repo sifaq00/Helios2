@@ -189,10 +189,10 @@ export default function TerminalDashboard() {
           </button>
           
           <div className="flex items-center gap-3 border-l border-[#333] pl-4">
-            <a href="https://github.com/x-cookie/mail-man" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff7a00] transition-colors">
+              <a href="https://github.com/sifaq00/Helios-2" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff7a00] transition-colors">
               <Twitter className="h-4 w-4" />
             </a>
-            <a href="https://github.com/omnicima/helios" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff7a00] transition-colors">
+              <a href="https://github.com/sifaq00/Helios-2" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#ff7a00] transition-colors">
               <Github className="h-4 w-4" />
             </a>
           </div>

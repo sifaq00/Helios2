@@ -21,8 +21,8 @@ jobs:
           HELIOS_URL: ${{ secrets.HELIOS_URL || vars.HELIOS_URL }}
           SYNC_SECRET: ${{ secrets.SYNC_SECRET }}
         run: |
-          # Default URL fallback - update HELIOS_URL secret if different
-          URL="${HELIOS_URL:-https://helios2.vercel.app}/api/sync"
+          # Default URL fallback
+          URL="${HELIOS_URL:-https://helios2-ashy.vercel.app}/api/sync"
           SECRET="${SYNC_SECRET:-helios-admin-2026}"
           
           echo "Syncing $URL ..."
@@ -68,7 +68,7 @@ jobs:
         env:
           HELIOS_URL: ${{ secrets.HELIOS_URL || vars.HELIOS_URL }}
         run: |
-          URL="${HELIOS_URL:-https://helios2.vercel.app}/api/news?limit=1&meta=1"
+          URL="${HELIOS_URL:-https://helios2-ashy.vercel.app}/api/news?limit=1&meta=1"
           echo "Checking $URL"
           curl -s "$URL" | head -c 500
           echo ""

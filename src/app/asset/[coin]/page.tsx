@@ -18,10 +18,10 @@ interface NewsItem {
   id: string;
   text: string;
   link: string;
-  ts: number;
+  ts: string | number;
   aiRating?: {
     score: number;
-    signal: "long" | "short" | "neutral";
+    signal: "long" | "short" | "neutral" | "bullish" | "bearish";
   };
 }
 
@@ -146,17 +146,19 @@ export default function AssetDetail() {
   const [aiInsight, setAiInsight] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Fetch data khusus untuk koin ini
+  // Fetch data khusus untuk koin ini - handle both array and envelope
   useEffect(() => {
     const fetchCoinData = async () => {
       setIsLoading(true);
       try {
         const res = await fetch(`/api/news?limit=20&coin=${coin}`);
         if (!res.ok) throw new Error("Failed to fetch data");
-        const data = await res.json();
-        setNews(data);
+        const json = await res.json();
+        const arr = Array.isArray(json) ? json : (json.data || json.payload || []);
+        setNews(Array.isArray(arr) ? arr : []);
       } catch (error) {
         console.error(error);
+        setNews([]);
       } finally {
         setIsLoading(false);
       }
@@ -167,15 +169,16 @@ export default function AssetDetail() {
     }
   }, [coin]);
 
-  // Kalkulasi Sentimen Dasar dari Feed
-  const bullishCount = news.filter(n => n.aiRating?.signal === "long").length;
-  const bearishCount = news.filter(n => n.aiRating?.signal === "short").length;
-  const neutralCount = news.length - bullishCount - bearishCount;
+  // Kalkulasi Sentimen - handle bullish/bearish + long/short, defensive array check
+  const safeNews = Array.isArray(news) ? news : [];
+  const bullishCount = safeNews.filter(n => n.aiRating?.signal === "long" || n.aiRating?.signal === "bullish").length;
+  const bearishCount = safeNews.filter(n => n.aiRating?.signal === "short" || n.aiRating?.signal === "bearish").length;
+  const neutralCount = safeNews.length - bullishCount - bearishCount;
 
   // Simulasi Pemanggilan LLM (OpenRouter)
   // Di produksi nyata, ini akan menembak ke endpoint /api/ai/summary milik Anda
   const generateAIInsight = async () => {
-    if (news.length === 0) return;
+    if (safeNews.length === 0) return;
     
     setIsGenerating(true);
     setAiInsight("");
@@ -186,7 +189,7 @@ export default function AssetDetail() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           coin: coin,
-          newsData: news.slice(0, 10), // Kirim 10 berita terbaru saja agar hemat token
+          newsData: safeNews.slice(0, 10), // Kirim 10 berita terbaru saja agar hemat token
         }),
       });
 
@@ -275,7 +278,7 @@ export default function AssetDetail() {
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4">
                     <Activity className="h-12 w-12 text-gray-700 mb-2" />
                     <p className="text-gray-500 text-sm max-w-xs">
-                      Engage LLM to analyze {news.length} recent data points and extract deep market context.
+                      Engage LLM to analyze {safeNews.length} recent data points and extract deep market context.
                     </p>
                     <button 
                       onClick={generateAIInsight}
@@ -324,7 +327,7 @@ export default function AssetDetail() {
                   <BarChart2 className="h-3 w-3" /> SIGNAL STRENGTH
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {news.length > 0 ? ((bullishCount / news.length) * 100).toFixed(0) : 0}%
+                  {safeNews.length > 0 ? ((bullishCount / safeNews.length) * 100).toFixed(0) : 0}%
                 </div>
               </div>
               <div className="border border-[#333] bg-[#0a0a0a] p-4">
@@ -332,7 +335,7 @@ export default function AssetDetail() {
                   <Zap className="h-3 w-3" /> AVG IMPACT
                 </div>
                 <div className="text-2xl font-bold text-white">
-                  {news.length > 0 ? (news.reduce((acc, curr) => acc + (curr.aiRating?.score || 0), 0) / news.length).toFixed(1) : 0}
+                  {safeNews.length > 0 ? (safeNews.reduce((acc, curr) => acc + (curr.aiRating?.score || 0), 0) / safeNews.length).toFixed(1) : 0}
                 </div>
               </div>
             </section>
@@ -356,12 +359,12 @@ export default function AssetDetail() {
                   <div className="text-[#ff7a00] text-center text-xs animate-pulse mt-10">
                     EXTRACTING TARGET DATA...
                   </div>
-                ) : news.length === 0 ? (
+                ) : safeNews.length === 0 ? (
                   <div className="text-gray-500 text-center text-xs mt-10">
                     NO ACTIVE SIGNALS FOR {coin}
                   </div>
                 ) : (
-                  news.map((item) => (
+                  safeNews.map((item) => (
                     <article key={item.id} className="py-3 first:pt-0 group">
                       <div className="flex justify-between items-start mb-1">
                         <span className="text-[10px] text-gray-500">{new Date(item.ts).toLocaleTimeString()}</span>

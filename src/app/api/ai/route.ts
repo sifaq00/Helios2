@@ -31,7 +31,7 @@ export async function POST(request: Request) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "mimo-v2-flash",
+            model: process.env.LLM_MODEL || "mimo-v2.5",
             messages: [{ role: "user", content: prompt }],
           }),
           signal: controller.signal

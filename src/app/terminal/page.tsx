@@ -28,7 +28,7 @@ interface NewsItem {
   coins?: { symbol: string; market_type: string }[];
   aiRating?: {
     score: number;
-    signal: "long" | "short" | "neutral";
+    signal: "long" | "short" | "neutral" | "bullish" | "bearish";
     summary?: string;
   };
 }
@@ -36,10 +36,17 @@ interface NewsItem {
 export default function TerminalDashboard() {
   const [newsFeed, setNewsFeed] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [displayLimit, setDisplayLimit] = useState(20);
   
   const [viralAnomalies, setViralAnomalies] = useState<any[]>([]);
   const [isViralLoading, setIsViralLoading] = useState(true);
+  
+  const [alphaSignals, setAlphaSignals] = useState<string[]>([]);
+  const [isAlphaLoading, setIsAlphaLoading] = useState(true);
   
   const [dailyBrief, setDailyBrief] = useState<string>("");
   const [isBriefLoading, setIsBriefLoading] = useState(true);
@@ -49,20 +56,50 @@ export default function TerminalDashboard() {
   // Anda bisa menggantinya nanti. gCNeDWCI0vo = Al Jazeera Live
   const LIVE_STREAM_ID = "gCNeDWCI0vo"; 
 
-  const fetchNews = async () => {
-    setIsLoading(true);
+  const fetchNews = async (reset = true, limitOverride?: number) => {
+    if (reset) {
+      setIsLoading(true);
+      setDisplayLimit(limitOverride || 20);
+    } else {
+      setIsLoadingMore(true);
+    }
     setError(null);
     try {
-      const response = await fetch("/api/news?limit=50"); 
+      const lim = reset ? (limitOverride || 50) : 50;
+      // Always fetch full 50 then client-paginate for smooth UX; backend pagination ready for future
+      const response = await fetch(`/api/news?limit=${lim}&meta=1`); 
       if (!response.ok) throw new Error("SECURE CONNECTION FAILED");
       
-      const data = await response.json();
+      const json = await response.json();
+      // Support both envelope {data, meta} and legacy array
+      const data = Array.isArray(json) ? json : (json.data || []);
+      const meta = Array.isArray(json) ? null : json.meta;
+      
       setNewsFeed(data);
+      if (meta) {
+        setTotalCount(meta.total);
+        setHasMore(meta.hasMore);
+      } else {
+        setTotalCount(data.length);
+        setHasMore(false);
+      }
+      // Reset display limit on fresh fetch
+      if (reset) setDisplayLimit(20);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    setDisplayLimit(prev => Math.min(prev + 20, newsFeed.length));
+  };
+
+  const handleShowAll = async () => {
+    await fetchNews(true, 50);
+    setDisplayLimit(50);
   };
 
   const fetchViralData = async () => {
@@ -72,11 +109,27 @@ export default function TerminalDashboard() {
       const data = await res.json();
       if (data.active_anomalies) {
         setViralAnomalies(data.active_anomalies);
+      } else if (Array.isArray(data)) {
+        setViralAnomalies(data);
       }
     } catch (err) {
       console.error("Viral Radar offline", err);
     } finally {
       setIsViralLoading(false);
+    }
+  };
+
+  const fetchAlphaSignals = async () => {
+    setIsAlphaLoading(true);
+    try {
+      const res = await fetch('/api/alpha-signals');
+      const data = await res.json();
+      if (Array.isArray(data)) setAlphaSignals(data);
+      else if (data.signals) setAlphaSignals(data.signals);
+    } catch (err) {
+      console.error("Alpha Signals offline", err);
+    } finally {
+      setIsAlphaLoading(false);
     }
   };
 
@@ -96,14 +149,15 @@ export default function TerminalDashboard() {
   };
 
   useEffect(() => {
-    // ponytail: client date only, hindari hydration mismatch locale
     setReportDate(new Date().toLocaleDateString().replace(/\//g, ''));
-    fetchNews();
+    fetchNews(true, 50);
     fetchViralData();
+    fetchAlphaSignals();
     fetchDailyBrief();
     const interval = setInterval(() => {
-      fetchNews();
+      fetchNews(false);
       fetchViralData();
+      fetchAlphaSignals();
     }, 60000); 
     return () => clearInterval(interval);
   }, []);
@@ -157,9 +211,21 @@ export default function TerminalDashboard() {
   const topMentions = getTopMentions();
   const trendingNarratives = getTrendingNarratives();
 
-  const highImpactNews = newsFeed.filter(n => (n.aiRating?.score || 0) >= 7);
-  const topNews = highImpactNews.length > 0 ? highImpactNews[0] : null;
-  const actionSignals = newsFeed.filter(n => n.aiRating?.signal === "long" || n.aiRating?.signal === "short" || n.aiRating?.signal === "bullish" || n.aiRating?.signal === "bearish").slice(0, 3);
+  // High impact: sort by score desc, prefer >=7 but fallback to highest available so section never empty if data exists
+  const sortedByImpact = [...newsFeed].sort((a, b) => (b.aiRating?.score || 0) - (a.aiRating?.score || 0));
+  const highImpactNews = sortedByImpact.filter(n => (n.aiRating?.score || 0) >= 7);
+  const topNews = highImpactNews.length > 0 ? highImpactNews[0] : (sortedByImpact[0] || null);
+  // For display, show impact badge only if score >=7 else show top score
+  const visibleNewsFeed = newsFeed.slice(0, displayLimit);
+
+  // Action signals: prioritize bullish/bearish with high score, include neutral only as fallback, max 5
+  const sortedSignals = [...newsFeed]
+    .filter(n => n.aiRating?.signal)
+    .sort((a, b) => (b.aiRating?.score || 0) - (a.aiRating?.score || 0));
+  const bullishBearish = sortedSignals.filter(n => ["long", "short", "bullish", "bearish"].includes(n.aiRating!.signal as string));
+  const actionSignals = (bullishBearish.length > 0 ? bullishBearish : sortedSignals).slice(0, 5);
+  // Prefer API alphaSignals if available (richer LLM synthesis)
+  const displayAlphaSignals = alphaSignals.length > 0 ? alphaSignals.slice(0, 5) : null;
 
   return (
     <main className="scanlines min-h-screen bg-black text-white font-mono selection:bg-[#ff7a00] selection:text-black">
@@ -184,7 +250,7 @@ export default function TerminalDashboard() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <button onClick={fetchNews} className="text-gray-500 hover:text-[#ff7a00] transition-colors" title="Force Refresh">
+          <button onClick={() => { fetchNews(true, 50); fetchViralData(); fetchAlphaSignals(); fetchDailyBrief(); }} className="text-gray-500 hover:text-[#ff7a00] transition-colors" title="Force Refresh">
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-[#ff7a00]' : ''}`} />
           </button>
           
@@ -266,11 +332,23 @@ export default function TerminalDashboard() {
             <div className="flex items-center gap-2 border-b border-[#333] px-3 py-2 text-white bg-[#111] tracking-widest text-sm">
               <Zap className="h-4 w-4 text-[#ff7a00]" />
               <h2>ALPHA SIGNALS</h2>
+              <span className="ml-auto text-[9px] text-gray-500">{isAlphaLoading ? "SYNC..." : `${alphaSignals.length || actionSignals.length} SIGNALS`}</span>
             </div>
             <div className="flex flex-col gap-4 p-4">
-              {actionSignals.length > 0 ? (
+              {displayAlphaSignals ? (
+                displayAlphaSignals.map((sig, idx) => {
+                  const isBullish = sig.toLowerCase().includes("bullish") || sig.toLowerCase().includes("long");
+                  const isBearish = sig.toLowerCase().includes("bearish") || sig.toLowerCase().includes("short");
+                  return (
+                    <div key={idx} className={`border-l-2 ${isBullish ? 'border-green-500' : isBearish ? 'border-red-500' : 'border-[#ff7a00]'} pl-3`}>
+                      <p className="text-[10px] text-gray-300 leading-relaxed line-clamp-3">{sig.replace(/^\*\s*/, '').replace(/^\d+\.\s*/, '')}</p>
+                      <span className={`text-[8px] mt-1 inline-block px-1 border ${isBullish ? 'border-green-900 text-green-500 bg-[#0a1a0a]' : isBearish ? 'border-red-900 text-red-500 bg-[#1a0a0a]' : 'border-[#333] text-gray-500 bg-[#111]'}`}>{isBullish ? "BULLISH" : isBearish ? "BEARISH" : "NEUTRAL"}</span>
+                    </div>
+                  );
+                })
+              ) : actionSignals.length > 0 ? (
                 actionSignals.map((signalItem) => (
-                  <div key={signalItem.id} className={`border-l-2 ${signalItem.aiRating?.signal === 'long' || signalItem.aiRating?.signal === 'bullish' ? 'border-green-500' : 'border-red-500'} pl-3`}>
+                  <div key={signalItem.id} className={`border-l-2 ${(signalItem.aiRating?.signal === 'long' || signalItem.aiRating?.signal === 'bullish') ? 'border-green-500' : signalItem.aiRating?.signal === 'neutral' ? 'border-[#ff7a00]' : 'border-red-500'} pl-3`}>
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-bold text-white uppercase text-sm">
                         {signalItem.coins && signalItem.coins.length > 0 ? signalItem.coins[0].symbol : "GLOBAL"}
@@ -283,7 +361,7 @@ export default function TerminalDashboard() {
                   </div>
                 ))
               ) : (
-                <div className="text-gray-500 text-[10px]">Scanning market matrix...</div>
+                <div className="text-gray-500 text-[10px]">{isAlphaLoading ? "Decrypting alpha matrix..." : "Scanning market matrix..."}</div>
               )}
             </div>
           </section>
@@ -329,11 +407,22 @@ export default function TerminalDashboard() {
             </div>
           </section>
 
-          <section className="flex h-[600px] flex-col border border-[#333] bg-black">
+          <section className="flex h-[650px] flex-col border border-[#333] bg-black">
             <div className="flex items-center justify-between border-b border-[#333] px-4 py-3 bg-[#0a0a0a]">
               <div className="flex items-center gap-2">
                 <Terminal className="h-5 w-5 text-[#ff7a00]" />
                 <h1 className="font-bold text-sm tracking-widest text-[#ff7a00]">RAW_DATA_STREAM</h1>
+                <span className="text-[10px] text-gray-500 bg-[#111] border border-[#333] px-2 py-0.5 ml-2">
+                  {totalCount || newsFeed.length} TOTAL • {visibleNewsFeed.length} SHOWN
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {displayLimit < newsFeed.length && (
+                  <span className="text-[9px] text-[#ff7a00] animate-pulse">{newsFeed.length - displayLimit} HIDDEN → LOAD MORE</span>
+                )}
+                <button onClick={() => fetchNews(true, 50)} className="text-gray-500 hover:text-[#ff7a00] transition-colors p-1" title="Refresh">
+                  <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+                </button>
               </div>
             </div>
 
@@ -347,8 +436,14 @@ export default function TerminalDashboard() {
                 <div className="text-[#ff7a00] border border-[#ff7a00] p-4 text-center text-sm">
                   [CRITICAL_FAILURE]: {error}
                 </div>
+              ) : visibleNewsFeed.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2">
+                  <Terminal className="h-8 w-8 opacity-30" />
+                  <span className="text-xs">No transmissions match filter</span>
+                  <button onClick={() => fetchNews(true, 50)} className="text-[10px] border border-[#333] px-3 py-1 hover:border-[#ff7a00] hover:text-[#ff7a00]">RELOAD FULL FEED</button>
+                </div>
               ) : (
-                newsFeed.map((news, idx) => (
+                visibleNewsFeed.map((news, idx) => (
                   <article key={news.id || idx} className="py-4 first:pt-0 hover:bg-[#050505] transition-colors group">
                     <div className="mb-2 flex items-center justify-between text-[10px]">
                       <div className="flex items-center gap-2 text-gray-500">
@@ -394,6 +489,36 @@ export default function TerminalDashboard() {
                 ))
               )}
             </div>
+            {/* Pagination footer */}
+            {!isLoading && visibleNewsFeed.length > 0 && (
+              <div className="border-t border-[#333] bg-[#0a0a0a] p-3 flex items-center justify-between">
+                <span className="text-[10px] text-gray-500">
+                  Showing {visibleNewsFeed.length} / {newsFeed.length} transmissions {totalCount ? `• DB ${totalCount} total` : ''}
+                </span>
+                <div className="flex gap-2">
+                  {displayLimit < newsFeed.length ? (
+                    <button
+                      onClick={handleLoadMore}
+                      disabled={isLoadingMore}
+                      className="border border-[#ff7a00] text-[#ff7a00] px-4 py-1.5 text-[10px] font-bold tracking-widest hover:bg-[#ff7a00] hover:text-black transition-colors disabled:opacity-50"
+                    >
+                      {isLoadingMore ? "LOADING..." : `LOAD MORE (+${Math.min(20, newsFeed.length - displayLimit)})`}
+                    </button>
+                  ) : newsFeed.length < (totalCount || 50) ? (
+                    <button
+                      onClick={handleShowAll}
+                      className="border border-[#333] text-gray-400 px-4 py-1.5 text-[10px] tracking-widest hover:border-[#ff7a00] hover:text-[#ff7a00] transition-colors"
+                    >
+                      FETCH ALL {totalCount || 50}
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-green-500 flex items-center gap-1">
+                      <Activity className="h-3 w-3" /> ALL CAUGHT UP
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </section>
         </div>
 

@@ -1,11 +1,7 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
-import Lenis from "lenis";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const CURVE = [
   { src: "/v2/img/hero.webp" },
@@ -28,32 +24,45 @@ const BELOW = [
 ];
 
 export default function Hero() {
+  const trackRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-    const raf = (time: number) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    // Entrance
+    const tl = gsap.timeline({ delay: 0.12 });
+    tl.from(".v3-hero-title", { y: 36, opacity: 0, duration: 0.7, ease: "power4.out" })
+      .from(".v3-hero-sub", { y: 14, opacity: 0, duration: 0.45 }, "-=0.35")
+      .from(".v3-hero-cta", { y: 10, opacity: 0, duration: 0.4 }, "-=0.25")
+      .from(".v3-curve-item", { y: 50, opacity: 0, duration: 0.6, stagger: 0.035, ease: "power3.out" }, "-=0.35")
+      .from(".v3-below-col", { y: 16, opacity: 0, duration: 0.45, stagger: 0.07 }, "-=0.25");
 
-    const tl = gsap.timeline({ delay: 0.15 });
-    tl.from(".v3-nav", { y: -20, opacity: 0, duration: 0.6, ease: "power3.out" })
-      .from(".v3-hero-title", { y: 40, opacity: 0, duration: 0.8, ease: "power4.out" }, "-=0.2")
-      .from(".v3-hero-sub", { y: 16, opacity: 0, duration: 0.5 }, "-=0.4")
-      .from(".v3-hero-cta", { y: 12, opacity: 0, duration: 0.4 }, "-=0.3")
-      .from(".v3-curve-item", { y: 60, opacity: 0, duration: 0.7, stagger: 0.04, ease: "power3.out" }, "-=0.4")
-      .from(".v3-below-col", { y: 20, opacity: 0, duration: 0.5, stagger: 0.08 }, "-=0.3");
-
-    gsap.to(".v3-curve", { y: -30, scrollTrigger: { trigger: ".v3-hero", start: "top top", end: "bottom top", scrub: 1 } });
-    gsap.to(".v3-hero-title", { y: -20, scrollTrigger: { trigger: ".v3-hero", start: "top top", end: "bottom 60%", scrub: 1 } });
-
-    return () => {
-      lenis.destroy();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    // Infinity loop - duplicate track
+    const track = trackRef.current;
+    if (track) {
+      const totalWidth = track.scrollWidth / 2;
+      gsap.to(track, {
+        x: -totalWidth,
+        duration: 28,
+        ease: "none",
+        repeat: -1,
+        modifiers: {
+          x: (x) => `${parseFloat(x) % totalWidth}px`,
+        },
+      });
+      // Pause on hover
+      const wrap = track.parentElement;
+      if (wrap) {
+        wrap.addEventListener("mouseenter", () => gsap.globalTimeline.pause());
+        wrap.addEventListener("mouseleave", () => gsap.globalTimeline.resume());
+        // Use specific tween pause
+        const tween = gsap.getTweensOf(track)[0];
+        wrap.addEventListener("mouseenter", () => tween?.pause());
+        wrap.addEventListener("mouseleave", () => tween?.resume());
+      }
+    }
   }, []);
+
+  // Build doubled array for seamless loop
+  const loop = [...CURVE, ...CURVE];
 
   return (
     <section className="v3-hero relative overflow-hidden bg-[#FFFBF0] pt-10 md:pt-14 pb-0">
@@ -75,37 +84,40 @@ export default function Hero() {
         </Link>
       </div>
 
-      <div className="v3-curve relative mt-10 md:mt-12">
-        <div className="relative mx-auto max-w-[1480px] overflow-visible">
-          <div className="flex items-end justify-center gap-2 md:gap-[10px] px-2" style={{ perspective: "1200px" }}>
-            {CURVE.map((c, i) => {
+      {/* CURVED STRIP - tengah kecil, samping gede 3D, infinity */}
+      <div className="relative mt-10 md:mt-12 overflow-hidden">
+        <div className="relative mx-auto max-w-[1600px]">
+          <div ref={trackRef} className="flex items-end gap-2 md:gap-3 w-max px-2" style={{ perspective: "1000px" }}>
+            {loop.map((c, i) => {
+              const origIdx = i % CURVE.length;
               const center = 5;
-              const dist = Math.abs(i - center);
-              const isSide = dist >= 4;
-              const h = isSide ? 280 : 220 - dist * 10;
-              const w = isSide ? 110 : i === 5 ? 88 : 76;
-              const rotate = (i - center) * 4.5;
-              const y = dist * 8;
+              const dist = Math.abs(origIdx - center);
+              // tengah kecil (76px/180h) -> samping gede (112px/300h) 3D
+              const isCenter = dist === 0;
+              const isNear = dist === 1;
+              const h = isCenter ? 176 : isNear ? 200 : dist === 2 ? 236 : dist === 3 ? 268 : 300;
+              const w = isCenter ? 72 : isNear ? 80 : dist === 2 ? 92 : dist === 3 ? 102 : 112;
+              const rotate = (origIdx - center) * 5.5;
+              const y = dist * 10;
               return (
                 <div
                   key={i}
-                  className="v3-curve-item shrink-0 overflow-hidden bg-[#e8e0d5] shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+                  className="v3-curve-item shrink-0 overflow-hidden bg-[#e8e0d5] shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
                   style={{
                     width: `${w}px`,
                     height: `${h}px`,
                     borderRadius: "18px",
                     transform: `translateY(${y}px) perspective(800px) rotateY(${rotate}deg)`,
-                    transformOrigin: i < center ? "right center" : "left center",
-                    opacity: 1 - dist * 0.04,
+                    transformOrigin: origIdx < center ? "right center" : "left center",
                   }}
                 >
-                  <img src={c.src} alt="" className="w-full h-full object-cover" />
+                  <img src={c.src} alt="" className="w-full h-full object-cover" draggable={false} />
                 </div>
               );
             })}
           </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-[8%] bg-gradient-to-r from-[#FFFBF0] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-[8%] bg-gradient-to-l from-[#FFFBF0] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#FFFBF0] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-[#FFFBF0] to-transparent" />
         </div>
 
         <div className="bg-[#FFFBF0] pt-10 pb-8">

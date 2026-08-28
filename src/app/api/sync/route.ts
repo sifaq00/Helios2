@@ -107,10 +107,19 @@ function parseRSSItems(xml: string, source: string): any[] {
       .trim()
       .slice(0, 300);
 
-    const link =
+    let link =
       block.match(/<link>([\s\S]*?)<\/link>/i)?.[1]?.trim() ||
       block.match(/<guid[^>]*>([\s\S]*?)<\/guid>/i)?.[1]?.trim() ||
       "";
+    // Strip CDATA wrapper that CoinTelegraph uses: <![CDATA[https://...]]>
+    link = link.replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "").trim();
+    link = decodeHtmlEntities(link).replace(/<[^>]+>/g, "").trim();
+    // Fallback: extract href if link still malformed
+    if (link && !link.startsWith("http")) {
+      const hrefMatch = link.match(/https?:\/\/[^\s"'<>]+/);
+      if (hrefMatch) link = hrefMatch[0];
+      else link = "";
+    }
 
     const pubDate = block.match(/<pubDate>(.*?)<\/pubDate>/i)?.[1] || new Date().toISOString();
     const ts = new Date(pubDate).toISOString();

@@ -273,25 +273,26 @@
 				<div data-speed="-100" style="position:relative; border:1px solid #ff7a00; background:#000; overflow:hidden; box-shadow:0 0 40px rgba(255,122,0,0.12);">
 					<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#0a0a0a; border-bottom:1px solid #222; font-family:monospace; font-size:10px;">
 						<span style="color:#ff7a00; letter-spacing:0.2em; font-weight:800;">● RAW_DATA_STREAM — 50 TOTAL • 20 SHOWN</span>
-						<span style="color:#00ff88; font-size:9px;">● LIVE 24MS</span>
+						<span id="v2-live-latency" style="color:#00ff88; font-size:9px;">● LIVE 24MS</span>
 					</div>
-					<div style="padding:16px; font-family:monospace; font-size:11px; line-height:1.7; color:#999;">
-						<div style="border-left:2px solid #ff7a00; padding-left:10px; margin-bottom:12px;">
+					<div style="padding:16px; font-family:monospace; font-size:11px; line-height:1.7; color:#999; position:relative;">
+						<div class="v2-preview-item" data-idx="0" style="border-left:2px solid #ff7a00; padding-left:10px; margin-bottom:12px; transition:all 0.4s; background:rgba(255,122,0,0.06);">
 							<span style="color:#ff7a00; font-size:9px;">IMPACT:9 • 14:05 UTC • @COINTELEGRAPH</span><br>
-							<span style="color:#fff; font-weight:700;">Fed Chair Kevin Warsh at Jackson Hole: 'We have work to do' on inflation</span><br>
+							<span style="color:#fff; font-weight:700;">Fed Chair Kevin Warsh at Jackson Hole: 'We have work to do' on inflation<span class="v2-typing" style="display:inline-block; width:7px; height:12px; background:#ff7a00; margin-left:4px; vertical-align:middle; animation:blink 0.9s infinite;"></span></span><br>
 							<span style="color:#666;">5.2% surge in Fed hawkish tone triggers risk-off rotation — watch BTC $81k support.</span>
 						</div>
-						<div style="border-left:2px solid #333; padding-left:10px; margin-bottom:12px; opacity:0.9;">
+						<div class="v2-preview-item" data-idx="1" style="border-left:2px solid #333; padding-left:10px; margin-bottom:12px; opacity:0.55; transition:all 0.4s;">
 							<span style="color:#666; font-size:9px;">IMPACT:8 • 13:30 UTC • @COINDESK</span><br>
 							<span style="color:#ddd;">Who is legally liable when an AI agent goes rogue?</span>
 						</div>
-						<div style="border-left:2px solid #333; padding-left:10px; opacity:0.6;">
+						<div class="v2-preview-item" data-idx="2" style="border-left:2px solid #333; padding-left:10px; opacity:0.35; transition:all 0.4s;">
 							<span style="color:#666; font-size:9px;">IMPACT:8 • 13:16 UTC • @DECRYPT</span><br>
 							<span style="color:#ddd;">Polish Olympic chief charged in Zondacrypto probe...</span>
 						</div>
-						<div style="text-align:center; margin-top:14px; color:#444; font-size:9px; letter-spacing:0.2em;">+ 47 MORE INTERCEPTS • SCROLL TO LOAD MORE →</div>
+						<div id="v2-preview-counter" style="text-align:center; margin-top:14px; color:#ff7a00; font-size:9px; letter-spacing:0.2em; font-weight:700;">+ 47 MORE INTERCEPTS • SCROLL TO LOAD MORE →</div>
+						<div id="v2-scanline" style="position:absolute; left:16px; right:16px; height:1px; background:linear-gradient(90deg, transparent, #ff7a00, transparent); opacity:0.6; top:16px; pointer-events:none; box-shadow:0 0 8px #ff7a00;"></div>
 					</div>
-					<div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.85) 100%); pointer-events:none;"></div>
+					<div style="position:absolute; inset:0; background:linear-gradient(to bottom, transparent 48%, rgba(0,0,0,0.92) 100%); pointer-events:none;"></div>
 					<a href="/terminal" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#ff7a00; color:#000; padding:14px 28px; font-family:monospace; font-size:11px; letter-spacing:0.25em; font-weight:900; text-decoration:none; box-shadow:0 0 30px rgba(255,122,0,0.5);">ENTER TERMINAL →</a>
 					<div style="position:absolute; top:12px; right:12px; width:12px; height:12px; border-top:2px solid #ff7a00; border-right:2px solid #ff7a00;"></div>
 					<div style="position:absolute; bottom:12px; left:12px; width:12px; height:12px; border-bottom:2px solid #ff7a00; border-left:2px solid #ff7a00;"></div>
@@ -323,16 +324,42 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
 	<script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
 	<script src="/v2/js/js.js"></script>
+	<style>@keyframes blink{0%,45%{opacity:1}50%,100%{opacity:0}} @keyframes v2pulse{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}</style>
 	<script>
 		// Live preview parallax + HUD
 		gsap.from('.v2-preview',{
 			opacity: 0, y: 30,
 			scrollTrigger:{trigger:'.v2-preview',start:'top 85%',end:'top 50%',scrub:1}
 		});
-		// Parallax like work section: header moves opposite to box
 		gsap.to('.v2-preview [data-speed="200"]',{ y: -18, scrollTrigger:{trigger:'.v2-preview',start:'top 80%',end:'bottom 20%',scrub:1} });
 		gsap.to('.v2-preview [data-speed="-100"]',{ y: 14, scrollTrigger:{trigger:'.v2-preview',start:'top 80%',end:'bottom 20%',scrub:1} });
 		gsap.to('.v2-preview [data-speed="150"]',{ y: -10, scrollTrigger:{trigger:'.v2-preview',start:'top 80%',end:'bottom 20%',scrub:1} });
+		// Looping interactive: highlight cycle + scanline + latency flicker + counter
+		(function(){
+			const items=document.querySelectorAll('.v2-preview-item');
+			const scan=document.getElementById('v2-scanline');
+			const lat=document.getElementById('v2-live-latency');
+			const counter=document.getElementById('v2-preview-counter');
+			let idx=0;
+			// scanline loop
+			if(scan) gsap.to(scan,{ top:'85%', duration:2.2, repeat:-1, ease:'none', yoyo:false });
+			// latency flicker 24MS -> 22-26
+			if(lat) setInterval(()=>{ const ms=22+Math.floor(Math.random()*5); lat.textContent='● LIVE '+ms+'MS'; lat.style.color= ms>25 ? '#ff7a00' : '#00ff88'; }, 900);
+			// counter increment loop
+			let more=47;
+			if(counter) setInterval(()=>{ more = 47 + Math.floor(Math.random()*4); counter.textContent='+ '+more+' MORE INTERCEPTS \u2022 SCROLL TO LOAD MORE \u2192'; counter.style.animation='v2pulse 0.3s'; setTimeout(()=>counter.style.animation='',300); }, 1800);
+			// highlight cycle
+			setInterval(()=>{
+				idx=(idx+1)%items.length;
+				items.forEach((el,i)=>{
+					const active=i===idx;
+					el.style.borderLeftColor=active?'#ff7a00':'#333';
+					el.style.opacity=active?'1':'0.45';
+					el.style.background=active?'rgba(255,122,0,0.06)':'transparent';
+					el.style.transform=active?'translateX(4px)':'translateX(0)';
+				});
+			}, 1800);
+		})();
 	</script>
 </body>
 

@@ -1,20 +1,24 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import gsap from "gsap";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
 
 const CURVE = [
-  { src: "/v2/img/hero.webp" },
-  { src: "/v2/img/neural-feed.webp" },
-  { src: "/v2/img/global-matrix.webp" },
-  { src: "/v2/img/alpha-shield.webp" },
-  { src: "/v2/img/viral-radar.webp" },
-  { src: "/logo.webp" },
-  { src: "/v2/img/mascot-about.webp" },
-  { src: "/v2/img/neural-feed.webp" },
-  { src: "/v2/img/global-matrix.webp" },
-  { src: "/v2/img/viral-radar.webp" },
-  { src: "/v2/img/hero.webp" },
+  "/v2/img/hero.webp",
+  "/v2/img/neural-feed.webp",
+  "/v2/img/global-matrix.webp",
+  "/v2/img/alpha-shield.webp",
+  "/v2/img/viral-radar.webp",
+  "/logo.webp",
+  "/v2/img/mascot-about.webp",
+  "/v2/img/neural-feed.webp",
+  "/v2/img/global-matrix.webp",
+  "/v2/img/viral-radar.webp",
+  "/v2/img/hero.webp",
 ];
 
 const BELOW = [
@@ -24,45 +28,14 @@ const BELOW = [
 ];
 
 export default function Hero() {
-  const trackRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    // Entrance
     const tl = gsap.timeline({ delay: 0.12 });
     tl.from(".v3-hero-title", { y: 36, opacity: 0, duration: 0.7, ease: "power4.out" })
       .from(".v3-hero-sub", { y: 14, opacity: 0, duration: 0.45 }, "-=0.35")
       .from(".v3-hero-cta", { y: 10, opacity: 0, duration: 0.4 }, "-=0.25")
-      .from(".v3-curve-item", { y: 50, opacity: 0, duration: 0.6, stagger: 0.035, ease: "power3.out" }, "-=0.35")
-      .from(".v3-below-col", { y: 16, opacity: 0, duration: 0.45, stagger: 0.07 }, "-=0.25");
-
-    // Infinity loop - duplicate track
-    const track = trackRef.current;
-    if (track) {
-      const totalWidth = track.scrollWidth / 2;
-      gsap.to(track, {
-        x: -totalWidth,
-        duration: 28,
-        ease: "none",
-        repeat: -1,
-        modifiers: {
-          x: (x) => `${parseFloat(x) % totalWidth}px`,
-        },
-      });
-      // Pause on hover
-      const wrap = track.parentElement;
-      if (wrap) {
-        wrap.addEventListener("mouseenter", () => gsap.globalTimeline.pause());
-        wrap.addEventListener("mouseleave", () => gsap.globalTimeline.resume());
-        // Use specific tween pause
-        const tween = gsap.getTweensOf(track)[0];
-        wrap.addEventListener("mouseenter", () => tween?.pause());
-        wrap.addEventListener("mouseleave", () => tween?.resume());
-      }
-    }
+      .from(".v3-curve-wrap", { y: 30, opacity: 0, duration: 0.6, ease: "power3.out" }, "-=0.2")
+      .from(".v3-below-col", { y: 16, opacity: 0, duration: 0.45, stagger: 0.07 }, "-=0.2");
   }, []);
-
-  // Build doubled array for seamless loop
-  const loop = [...CURVE, ...CURVE];
 
   return (
     <section className="v3-hero relative overflow-hidden bg-[#FFFBF0] pt-10 md:pt-14 pb-0">
@@ -84,43 +57,46 @@ export default function Hero() {
         </Link>
       </div>
 
-      {/* CURVED STRIP - tengah kecil, samping gede 3D, infinity */}
-      <div className="relative mt-10 md:mt-12 overflow-hidden">
-        <div className="relative mx-auto max-w-[1600px]">
-          <div ref={trackRef} className="flex items-end gap-2 md:gap-3 w-max px-2" style={{ perspective: "1000px" }}>
-            {loop.map((c, i) => {
-              const origIdx = i % CURVE.length;
-              const center = 5;
-              const dist = Math.abs(origIdx - center);
-              // tengah kecil (76px/180h) -> samping gede (112px/300h) 3D
-              const isCenter = dist === 0;
-              const isNear = dist === 1;
-              const h = isCenter ? 176 : isNear ? 200 : dist === 2 ? 236 : dist === 3 ? 268 : 300;
-              const w = isCenter ? 72 : isNear ? 80 : dist === 2 ? 92 : dist === 3 ? 102 : 112;
-              const rotate = (origIdx - center) * 5.5;
-              const y = dist * 10;
-              return (
-                <div
-                  key={i}
-                  className="v3-curve-item shrink-0 overflow-hidden bg-[#e8e0d5] shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
-                  style={{
-                    width: `${w}px`,
-                    height: `${h}px`,
-                    borderRadius: "18px",
-                    transform: `translateY(${y}px) perspective(800px) rotateY(${rotate}deg)`,
-                    transformOrigin: origIdx < center ? "right center" : "left center",
-                  }}
-                >
-                  <img src={c.src} alt="" className="w-full h-full object-cover" draggable={false} />
+      <style>{`.v3-curve .swiper-slide{transition:transform 0.45s ease} .v3-curve .swiper-slide-active{transform:scale(0.84) !important} .v3-curve .swiper-slide-prev,.v3-curve .swiper-slide-next{transform:scale(0.94) !important} .v3-curve .swiper-slide-prev-prev,.v3-curve .swiper-slide-next-next{transform:scale(1.04) !important}`}</style>
+      {/* 3D Circular Coverflow - pakai Swiper library */}
+      <div className="v3-curve-wrap relative mt-10 md:mt-12">
+        <div className="relative mx-auto max-w-[1500px]">
+          <Swiper
+            modules={[EffectCoverflow, Autoplay]}
+            effect="coverflow"
+            grabCursor
+            centeredSlides
+            loop
+            slidesPerView="auto"
+            autoplay={{ delay: 0, disableOnInteraction: false, pauseOnMouseEnter: true }}
+            speed={6500}
+            coverflowEffect={{
+              rotate: 32,
+              stretch: -14,
+              depth: -140,
+              modifier: 1.4,
+              slideShadows: false,
+            }}
+            className="!pb-10 !pt-2"
+            style={{ paddingBottom: "40px" } as React.CSSProperties}
+          >
+            {CURVE.map((src, i) => (
+              <SwiperSlide
+                key={i}
+                className="!w-[72px] md:!w-[92px]"
+                style={{ height: "260px" } as React.CSSProperties}
+              >
+                <div className="w-full h-full rounded-[18px] overflow-hidden bg-[#e8e0d5] shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+                  <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
                 </div>
-              );
-            })}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#FFFBF0] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-[#FFFBF0] to-transparent" />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#FFFBF0] to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-[#FFFBF0] to-transparent z-10" />
         </div>
 
-        <div className="bg-[#FFFBF0] pt-10 pb-8">
+        <div className="bg-[#FFFBF0] pt-6 pb-8">
           <div className="mx-auto max-w-[1060px] px-6 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#e8e0d5]">
             {BELOW.map((f) => (
               <div key={f.title} className="v3-below-col px-0 md:px-8 py-6 md:py-2 text-center">

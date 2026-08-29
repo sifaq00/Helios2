@@ -50,8 +50,8 @@ export default function LandingV3() {
         if (element) {
           lenis.scrollTo(element as HTMLElement, {
             offset: -75,
-            duration: 1.15,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            duration: 1.6,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -7 * t)),
           });
         }
       }

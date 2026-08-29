@@ -21,6 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" as="image" href="/v3/hero/1.webp" />
+        <link rel="preload" as="image" href="/v3/hero/2.webp" />
+        <link rel="preload" as="image" href="/v3/hero/3.webp" />
+        <link rel="preload" as="image" href="/v3/hero/4.webp" />
+        <link rel="preload" as="image" href="/v3/hero/5.webp" />
+        <link rel="preload" as="image" href="/v3/hero/6.webp" />
+        <link rel="preload" as="image" href="/v3/hero/7.webp" />
+      </head>
       <body className="antialiased">
         {children}
       </body>

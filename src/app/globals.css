@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "../../public/fonts/Olive101.css";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+
 :root {
   --background: #000000;
   --foreground: #ffffff;

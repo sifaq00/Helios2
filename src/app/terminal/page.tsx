@@ -760,7 +760,7 @@ export default function TerminalDashboard() {
                     
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { label: "KERNEL", val: "v4.21.0-MM", color: "text-[#ff7a00]" },
+                        { label: "KERNEL", val: "ACTIVE", color: "text-[#ff7a00]" },
                         { label: "LATENCY", val: "24MS / NOMINAL", color: "text-white" },
                         { label: "NEURAL", val: "MISTRAL-SM", color: "text-white" },
                         { label: "UPTIME", val: "99.97% LIVE", color: "text-green-500" },

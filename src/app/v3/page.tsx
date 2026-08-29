@@ -187,25 +187,6 @@ export default function LandingV3() {
           }
         );
       }
-
-      // 6. Section Titles smooth entrance
-      gsap.utils.toArray<HTMLElement>(".v3-section-reveal").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0.85, y: 14 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 92%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
-      });
     });
 
     // Refresh ScrollTrigger after DOM layout stabilizes

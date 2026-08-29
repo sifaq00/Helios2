@@ -26,7 +26,6 @@ const BELOW = [
 ];
 
 export default function Hero() {
-  const [mounted, setMounted] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const swiperRef = useRef<any>(null);
   const baseTranslate = useRef<number | null>(null);
@@ -36,7 +35,6 @@ export default function Hero() {
   const isHeroVisible = useRef(true);
 
   useEffect(() => {
-    setMounted(true);
 
     const el = sectionRef.current;
     if (el && typeof IntersectionObserver !== "undefined") {
@@ -200,53 +198,51 @@ export default function Hero() {
       {/* Full width edge-to-edge stream */}
       <div className="v3-curve-wrap v3-anim-stream relative mt-8 md:mt-10 w-full overflow-hidden min-h-[340px]">
         <div className="relative w-full overflow-hidden">
-          {mounted && (
-            <Swiper
-              ref={swiperRef}
-              modules={[Autoplay]}
-              centeredSlides
-              loop={true}
-              initialSlide={14}
-              loopAdditionalSlides={14}
-              slidesPerView={7}
-              spaceBetween={14}
-              breakpoints={{
-                0: { slidesPerView: 3, spaceBetween: 10 },
-                640: { slidesPerView: 5, spaceBetween: 12 },
-                1024: { slidesPerView: 7, spaceBetween: 14 },
-                1440: { slidesPerView: 7.5, spaceBetween: 16 },
-              }}
-              autoplay={{ delay: 2200, disableOnInteraction: false, pauseOnMouseEnter: false }}
-              speed={600}
-              allowTouchMove={true}
-              simulateTouch={false}
-              resistanceRatio={0}
-              touchReleaseOnEdges={true}
-              observer={true}
-              observeParents={true}
-              watchSlidesProgress={true}
-              className="v3-curve !pb-10 !pt-6 w-full"
-              style={{ paddingTop:"18px", paddingBottom:"40px" } as React.CSSProperties}
-            >
-              {CURVE.map((src, i) => {
-                const frame = String((i % 7) + 1).padStart(2, "0");
-                return (
-                  <SwiperSlide
-                    key={`${src}-${i}`}
-                    className="!h-[320px] flex items-start justify-center pt-1"
-                    style={{ height: "320px" } as React.CSSProperties}
-                  >
-                    <div className="slide-inner w-full h-[280px] flex flex-col overflow-hidden -translate-y-8">
-                      <div className="flex items-center justify-between px-2 py-1 bg-[#111] text-white text-[7px] font-mono tracking-[0.14em] shrink-0">
-                        <span>CURVE {frame} / 07</span><span className="text-white/60">HELIOS</span>
-                      </div>
-                      <img src={src} alt={`Helios curve ${frame} of 7`} className="w-full flex-1 object-cover" draggable={false} loading="eager" />
+          <Swiper
+            ref={swiperRef}
+            modules={[Autoplay]}
+            centeredSlides
+            loop={true}
+            initialSlide={14}
+            loopAdditionalSlides={14}
+            slidesPerView={7}
+            spaceBetween={14}
+            breakpoints={{
+              0: { slidesPerView: 3, spaceBetween: 10 },
+              640: { slidesPerView: 5, spaceBetween: 12 },
+              1024: { slidesPerView: 7, spaceBetween: 14 },
+              1440: { slidesPerView: 7.5, spaceBetween: 16 },
+            }}
+            autoplay={{ delay: 2200, disableOnInteraction: false, pauseOnMouseEnter: false }}
+            speed={600}
+            allowTouchMove={true}
+            simulateTouch={false}
+            resistanceRatio={0}
+            touchReleaseOnEdges={true}
+            observer={true}
+            observeParents={true}
+            watchSlidesProgress={true}
+            className="v3-curve !pb-10 !pt-6 w-full"
+            style={{ paddingTop:"18px", paddingBottom:"40px" } as React.CSSProperties}
+          >
+            {CURVE.map((src, i) => {
+              const frame = String((i % 7) + 1).padStart(2, "0");
+              return (
+                <SwiperSlide
+                  key={`${src}-${i}`}
+                  className="!h-[320px] flex items-start justify-center pt-1"
+                  style={{ height: "320px" } as React.CSSProperties}
+                >
+                  <div className="slide-inner w-full h-[280px] flex flex-col overflow-hidden -translate-y-8">
+                    <div className="flex items-center justify-between px-2 py-1 bg-[#111] text-white text-[7px] font-mono tracking-[0.14em] shrink-0">
+                      <span>CURVE {frame} / 07</span><span className="text-white/60">HELIOS</span>
                     </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          )}
+                    <img src={src} alt={`Helios curve ${frame} of 7`} className="w-full flex-1 object-cover" draggable={false} loading="eager" />
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
           <div className="pointer-events-none absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-[#FFFBF0] to-transparent z-10" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-[#FFFBF0] to-transparent z-10" />
         </div>

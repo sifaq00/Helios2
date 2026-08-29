@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
 
 const NAV_LINKS = [
+  { href: "#top", label: "Home" },
   { href: "#features", label: "Features" },
   { href: "#pipeline", label: "Pipeline" },
   { href: "#proven", label: "Proven" },
@@ -65,7 +66,7 @@ export default function Navbar() {
       <div className="mx-auto max-w-[1280px] px-6 py-4 flex items-center justify-between">
         {/* Left desktop links */}
         <div className="hidden md:flex items-center gap-7 text-[12.5px] font-medium text-[#111]">
-          {NAV_LINKS.slice(0, 3).map((l) => (
+          {NAV_LINKS.slice(0, 4).map((l) => (
             <a key={l.href} href={l.href} className="hover:text-[#ff7a00] transition-colors">
               {l.label}
             </a>

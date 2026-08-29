@@ -44,7 +44,13 @@ export default function LandingV3() {
       const target = (e.target as HTMLElement).closest("a");
       if (!target) return;
       const href = target.getAttribute("href");
-      if (href && href.startsWith("#") && href.length > 1) {
+      if (href === "#" || href === "#top") {
+        e.preventDefault();
+        lenis.scrollTo(0, {
+          duration: 1.6,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -7 * t)),
+        });
+      } else if (href && href.startsWith("#") && href.length > 1) {
         e.preventDefault();
         const element = document.querySelector(href);
         if (element) {

@@ -142,7 +142,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="v3-hero relative overflow-visible bg-[#FFFBF0] pt-20 md:pt-24 pb-0">
+    <section ref={sectionRef} id="top" className="v3-hero relative overflow-visible bg-[#FFFBF0] pt-20 md:pt-24 pb-0">
       <div className="mx-auto max-w-[1280px] px-6 text-center">
         <div className="mx-auto max-w-[760px]">
           <p className="v3-hero-kicker v3-anim-kicker mb-3 inline-flex items-center gap-2 text-[10px] tracking-[0.2em] text-[#ff3b30] font-mono">

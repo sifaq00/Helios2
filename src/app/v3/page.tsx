@@ -39,6 +39,26 @@ export default function LandingV3() {
 
     lenis.on("scroll", ScrollTrigger.update);
 
+    // Global smooth anchor click handler via Lenis
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest("a");
+      if (!target) return;
+      const href = target.getAttribute("href");
+      if (href && href.startsWith("#") && href.length > 1) {
+        e.preventDefault();
+        const element = document.querySelector(href);
+        if (element) {
+          lenis.scrollTo(element as HTMLElement, {
+            offset: -75,
+            duration: 1.15,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          });
+        }
+      }
+    };
+
+    document.addEventListener("click", handleAnchorClick);
+
     let reqId = requestAnimationFrame(function raf(time) {
       lenis.raf(time);
       reqId = requestAnimationFrame(raf);
@@ -189,6 +209,7 @@ export default function LandingV3() {
 
     return () => {
       clearTimeout(refreshTimer);
+      document.removeEventListener("click", handleAnchorClick);
       cancelAnimationFrame(reqId);
       ctx.revert();
       lenis.destroy();

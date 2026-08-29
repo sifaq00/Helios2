@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "900"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+  weight: ["400"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "HELIOS",
@@ -20,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
       <head>
         <link rel="preload" as="image" href="/v3/hero/1.webp" />
         <link rel="preload" as="image" href="/v3/hero/2.webp" />
@@ -30,7 +46,7 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/v3/hero/6.webp" />
         <link rel="preload" as="image" href="/v3/hero/7.webp" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased font-sans">
         {children}
       </body>
     </html>

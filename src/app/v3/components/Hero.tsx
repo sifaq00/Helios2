@@ -26,6 +26,7 @@ const BELOW = [
 ];
 
 export default function Hero() {
+  const [swiperReady, setSwiperReady] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const swiperRef = useRef<any>(null);
   const baseTranslate = useRef<number | null>(null);
@@ -222,7 +223,10 @@ export default function Hero() {
             observer={true}
             observeParents={true}
             watchSlidesProgress={true}
-            className="v3-curve !pb-10 !pt-6 w-full"
+            onSwiper={() => {
+              setTimeout(() => setSwiperReady(true), 30);
+            }}
+            className={`v3-curve !pb-10 !pt-6 w-full transition-opacity duration-700 ease-out ${swiperReady ? "opacity-100" : "opacity-0"}`}
             style={{ paddingTop:"18px", paddingBottom:"40px" } as React.CSSProperties}
           >
             {CURVE.map((src, i) => {

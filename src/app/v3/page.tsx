@@ -207,7 +207,6 @@ export default function LandingV3() {
   return (
     <div className="min-h-screen bg-[#FFFBF0] text-[#111] selection:bg-[#ff7a00]/20 antialiased overflow-x-hidden">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;900&display=swap');
         html {
           scroll-behavior: auto !important;
         }

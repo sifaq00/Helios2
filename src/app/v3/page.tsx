@@ -189,6 +189,22 @@ export default function LandingV3() {
       }
     });
 
+    // Smooth Staggered Section Reveal (Identical to Hero cubic-bezier ease)
+    const sections = document.querySelectorAll(".v3-reveal-section");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("v3-revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -30px 0px" }
+    );
+
+    sections.forEach((sec) => observer.observe(sec));
+
     // Refresh ScrollTrigger after DOM layout stabilizes
     const refreshTimer = setTimeout(() => {
       ScrollTrigger.refresh();
@@ -197,6 +213,7 @@ export default function LandingV3() {
     return () => {
       clearTimeout(refreshTimer);
       document.removeEventListener("click", handleAnchorClick);
+      observer.disconnect();
       cancelAnimationFrame(reqId);
       ctx.revert();
       lenis.destroy();
@@ -210,6 +227,16 @@ export default function LandingV3() {
         html {
           scroll-behavior: auto !important;
         }
+        .v3-reveal-section {
+          opacity: 0;
+          transform: translate3d(0, 26px, 0);
+          transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity, transform;
+        }
+        .v3-reveal-section.v3-revealed {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
         .feat-card, .v3-parallax-img, .v3-cta-archer, .v3-hero-title {
           will-change: transform;
           transform: translateZ(0);
@@ -222,17 +249,22 @@ export default function LandingV3() {
             transition-duration: 0.01ms !important;
             scroll-behavior: auto !important;
           }
+          .v3-reveal-section {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+          }
         }
       `}</style>
       <Navbar />
       <Hero />
-      <MarqueeTicker />
-      <Features />
-      <Architecture />
-      <Proven />
-      <Faq />
-      <CtaBanner />
-      <Footer />
+      <div className="v3-reveal-section"><MarqueeTicker /></div>
+      <div className="v3-reveal-section"><Features /></div>
+      <div className="v3-reveal-section"><Architecture /></div>
+      <div className="v3-reveal-section"><Proven /></div>
+      <div className="v3-reveal-section"><Faq /></div>
+      <div className="v3-reveal-section"><CtaBanner /></div>
+      <div className="v3-reveal-section"><Footer /></div>
     </div>
   );
 }
